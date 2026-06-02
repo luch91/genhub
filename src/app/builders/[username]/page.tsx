@@ -1,0 +1,132 @@
+import type { Metadata } from "next"
+import { notFound } from "next/navigation"
+import Image from "next/image"
+import { db } from "@/lib/db"
+import { ProjectCard } from "@/components/projects/project-card"
+import { formatDate } from "@/lib/utils"
+
+type PageProps = { params: Promise<{ username: string }> }
+
+async function getBuilder(username: string) {
+  return db.user.findUnique({
+    where: { username },
+    include: {
+      projects: {
+        where: { status: "PUBLISHED" },
+        orderBy: { createdAt: "desc" },
+        include: {
+          author: { select: { id: true, name: true, username: true, image: true } },
+          tags: { include: { tag: { select: { id: true, name: true, slug: true } } } },
+          _count: { select: { upvotes: true, comments: true, updates: true } },
+        },
+      },
+      _count: { select: { projects: true, updates: true } },
+    },
+  })
+}
+
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { username } = await params
+  const builder = await getBuilder(username)
+  if (!builder) return {}
+  return {
+    title: builder.name ?? builder.username ?? "Builder",
+    description: builder.bio ?? undefined,
+  }
+}
+
+export default async function BuilderProfilePage({ params }: PageProps) {
+  const { username } = await params
+  const builder = await getBuilder(username)
+  if (!builder) notFound()
+
+  return (
+    <div className="mx-auto max-w-4xl px-6 py-12">
+      {/* Profile header */}
+      <div className="mb-10 flex flex-col gap-6 sm:flex-row sm:items-start">
+        {builder.image ? (
+          <Image
+            src={builder.image}
+            alt={builder.name ?? ""}
+            width={80}
+            height={80}
+            className="rounded-full"
+          />
+        ) : (
+          <div className="h-20 w-20 flex-shrink-0 rounded-full bg-slate-800" />
+        )}
+
+        <div className="flex-1">
+          <h1 className="text-2xl font-bold text-white">{builder.name}</h1>
+          <p className="text-slate-500">@{builder.username}</p>
+          {builder.bio && (
+            <p className="mt-3 max-w-xl text-slate-400">{builder.bio}</p>
+          )}
+
+          <div className="mt-4 flex flex-wrap gap-4 text-sm text-slate-500">
+            {builder.twitterHandle && (
+              <a
+                href={`https://twitter.com/${builder.twitterHandle}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-violet-400"
+              >
+                @{builder.twitterHandle}
+              </a>
+            )}
+            {builder.githubHandle && (
+              <a
+                href={`https://github.com/${builder.githubHandle}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-violet-400"
+              >
+                {builder.githubHandle}
+              </a>
+            )}
+            {builder.website && (
+              <a
+                href={builder.website}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-violet-400"
+              >
+                {builder.website.replace(/^https?:\/\//, "")}
+              </a>
+            )}
+            <span>Joined {formatDate(builder.createdAt)}</span>
+          </div>
+        </div>
+
+        <div className="flex gap-6 text-center">
+          <div>
+            <div className="text-xl font-bold text-white">{builder._count.projects}</div>
+            <div className="text-xs text-slate-500">Projects</div>
+          </div>
+          <div>
+            <div className="text-xl font-bold text-white">{builder._count.updates}</div>
+            <div className="text-xs text-slate-500">Updates</div>
+          </div>
+        </div>
+      </div>
+
+      {/* Projects */}
+      <div>
+        <h2 className="section-heading mb-4">
+          Projects
+        </h2>
+        {builder.projects.length > 0 ? (
+          <div className="grid gap-4 sm:grid-cols-2">
+            {builder.projects.map((project) => (
+              <ProjectCard key={project.id} project={project} />
+            ))}
+          </div>
+        ) : (
+          <div className="rounded-xl border border-dashed border-slate-800 py-12 text-center">
+            <p className="text-slate-500">No published projects yet.</p>
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
