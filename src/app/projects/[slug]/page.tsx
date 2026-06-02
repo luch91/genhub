@@ -9,9 +9,9 @@ import { CommentSection } from "@/components/comments/comment-section"
 
 type PageProps = { params: Promise<{ slug: string }> }
 
-async function getProject(slug: string) {
-  return db.project.findUnique({
-    where: { slug, status: "PUBLISHED" },
+async function getProject(slug: string, userId?: string) {
+  const project = await db.project.findUnique({
+    where: { slug },
     include: {
       author: { select: { id: true, name: true, username: true, image: true } },
       tags: { include: { tag: { select: { id: true, name: true, slug: true } } } },
@@ -29,13 +29,23 @@ async function getProject(slug: string) {
         },
       },
       _count: { select: { upvotes: true, comments: true, updates: true } },
+      reviews: { select: { decision: true, feedback: true } },
     },
   })
+
+  if (!project) return null
+  if (project.status === "PUBLISHED") return project
+  // PENDING_REVIEW visible to author only
+  if (project.status === "PENDING_REVIEW" && project.authorId === userId) return project
+  // DRAFT visible to author only
+  if (project.status === "DRAFT" && project.authorId === userId) return project
+  return null
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params
-  const project = await getProject(slug)
+  const session = await auth()
+  const project = await getProject(slug, session?.user?.id)
   if (!project) return {}
   return {
     title: project.title,
@@ -45,11 +55,42 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function ProjectPage({ params }: PageProps) {
   const { slug } = await params
-  const [project, session] = await Promise.all([getProject(slug), auth()])
+  const session = await auth()
+  const project = await getProject(slug, session?.user?.id)
   if (!project) notFound()
+
+  const approvals = project.reviews.filter((r) => r.decision === "APPROVED").length
+  const rejections = project.reviews.filter((r) => r.decision === "REJECTED").length
+  const rejectionFeedback = project.reviews
+    .filter((r) => r.decision === "REJECTED" && r.feedback)
+    .map((r) => r.feedback)
 
   return (
     <div className="mx-auto max-w-4xl px-6 py-12">
+      {/* Status banners — only visible to author */}
+      {project.status === "PENDING_REVIEW" && (
+        <div className="mb-6 rounded-xl border border-amber-700/50 bg-amber-950/20 px-5 py-4">
+          <p className="font-medium text-amber-300">Under review</p>
+          <p className="mt-1 text-sm text-amber-600">
+            Your project needs 3 community approvals before it goes live.{" "}
+            {approvals}/3 approvals · {rejections}/3 rejections
+          </p>
+        </div>
+      )}
+      {project.status === "DRAFT" && rejectionFeedback.length > 0 && (
+        <div className="mb-6 rounded-xl border border-red-800/50 bg-red-950/20 px-5 py-4">
+          <p className="font-medium text-red-300">Needs revision</p>
+          <p className="mt-1 text-sm text-red-600">
+            Your project was rejected by the community. Address the feedback below and resubmit.
+          </p>
+          <ul className="mt-3 space-y-1">
+            {rejectionFeedback.map((f, i) => (
+              <li key={i} className="text-sm text-red-500">· {f}</li>
+            ))}
+          </ul>
+        </div>
+      )}
+
       <div className="grid gap-8 lg:grid-cols-[1fr_280px]">
         {/* Main content */}
         <div className="space-y-8">

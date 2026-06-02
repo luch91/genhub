@@ -59,6 +59,17 @@ export async function POST(request: NextRequest) {
     return Response.json({ error: result.error.flatten() }, { status: 422 })
   }
 
+  const author = await db.user.findUnique({
+    where: { id: session.user.id },
+    select: { submissionCredits: true },
+  })
+  if (!author || author.submissionCredits < 1) {
+    return Response.json(
+      { error: "You have no submission credits. Earn them back by contributing to the community." },
+      { status: 403 }
+    )
+  }
+
   const { tags, contractAddress, repoUrl, demoUrl, ...rest } = result.data
 
   const baseSlug = slugify(rest.title)
@@ -73,7 +84,7 @@ export async function POST(request: NextRequest) {
       contractAddress: contractAddress || null,
       repoUrl: repoUrl || null,
       demoUrl: demoUrl || null,
-      status: "PUBLISHED",
+      status: "PENDING_REVIEW",
       authorId: session.user.id,
       tags: {
         create: await Promise.all(
@@ -89,6 +100,11 @@ export async function POST(request: NextRequest) {
         ),
       },
     },
+  })
+
+  await db.user.update({
+    where: { id: session.user.id },
+    data: { submissionCredits: { decrement: 1 } },
   })
 
   return Response.json(project, { status: 201 })

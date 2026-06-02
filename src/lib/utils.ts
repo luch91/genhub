@@ -63,6 +63,14 @@ export const UPDATE_TYPE_LABELS = {
   BREAKTHROUGH: "Breakthrough",
 } as const
 
+export const REVIEW_THRESHOLDS = {
+  APPROVALS_NEEDED: 3,
+  REJECTIONS_NEEDED: 3,
+  UPVOTES_FOR_CREDIT: 5,
+  // Option B hook: swap the canReview() check to use this instead of publishedProjects >= 1
+  MIN_REPUTATION_TO_REVIEW: 50,
+} as const
+
 export const UPDATE_TYPE_COLORS = {
   GENERAL: "bg-slate-800 text-slate-300",
   MILESTONE: "bg-violet-900/50 text-violet-300",

@@ -54,14 +54,16 @@ model User {
   emailVerified DateTime?
   image         String?
 
-  username      String?   @unique
-  bio           String?   @db.Text
+  username          String?   @unique
+  bio               String?   @db.Text
   twitterHandle String?
   githubHandle  String?
   website       String?
-  walletAddress String?   @unique
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  walletAddress     String?   @unique
+  submissionCredits Int       @default(2)
+  reputationScore   Int       @default(0)
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
 
   accounts    Account[]
   sessions    Session[]
@@ -69,12 +71,14 @@ model User {
   updates     ProjectUpdate[]
   comments    Comment[]
   upvotes     Upvote[]
-  discussions Discussion[]
-  replies     Reply[]
+  discussions     Discussion[]
+  replies         Reply[]
+  projectReviews  ProjectReview[]
 }
 
 enum ProjectStatus {
   DRAFT
+  PENDING_REVIEW
   PUBLISHED
   ARCHIVED
 }
@@ -87,11 +91,12 @@ model Project {
   description   String        @db.Text
   genlayerAngle String        @db.Text
   contractAddress String?
-  verified      Boolean       @default(false)
-  repoUrl       String?
-  demoUrl       String?
-  coverImage    String?
-  status        ProjectStatus @default(DRAFT)
+  verified       Boolean       @default(false)
+  creditRestored Boolean       @default(false)
+  repoUrl        String?
+  demoUrl        String?
+  coverImage     String?
+  status         ProjectStatus @default(DRAFT)
   createdAt     DateTime      @default(now())
   updatedAt     DateTime      @updatedAt
 
@@ -102,6 +107,7 @@ model Project {
   updates  ProjectUpdate[]
   comments Comment[]
   upvotes  Upvote[]
+  reviews  ProjectReview[]
 }
 
 model Tag {
@@ -158,6 +164,26 @@ model Comment {
 
   updateId String?
   update   ProjectUpdate? @relation(fields: [updateId], references: [id], onDelete: Cascade)
+}
+
+enum ReviewDecision {
+  APPROVED
+  REJECTED
+}
+
+model ProjectReview {
+  id        String         @id @default(cuid())
+  decision  ReviewDecision
+  feedback  String?        @db.Text
+  createdAt DateTime       @default(now())
+
+  projectId  String
+  project    Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  reviewerId String
+  reviewer   User   @relation(fields: [reviewerId], references: [id], onDelete: Cascade)
+
+  @@unique([reviewerId, projectId])
 }
 
 model Upvote {

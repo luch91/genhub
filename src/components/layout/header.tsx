@@ -1,9 +1,11 @@
 import Link from "next/link"
 import Image from "next/image"
 import { auth, signOut } from "@/lib/auth"
+import { canReview } from "@/lib/review"
 
 export async function Header() {
   const session = await auth()
+  const eligible = session?.user ? await canReview(session.user.id) : false
 
   return (
     <header className="sticky top-0 z-50 border-b border-slate-800 bg-background/80 backdrop-blur">
@@ -30,6 +32,11 @@ export async function Header() {
           <Link href="/discuss" className="btn-ghost py-1.5 text-sm">
             Discuss
           </Link>
+          {eligible && (
+            <Link href="/review" className="btn-ghost py-1.5 text-sm text-amber-400 hover:text-amber-300">
+              Review
+            </Link>
+          )}
         </nav>
 
         {/* Auth */}

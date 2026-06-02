@@ -1,6 +1,7 @@
 import { NextRequest } from "next/server"
 import { auth } from "@/lib/auth"
 import { db } from "@/lib/db"
+import { REVIEW_THRESHOLDS } from "@/lib/utils"
 
 type Params = { params: Promise<{ id: string }> }
 
@@ -24,5 +25,24 @@ export async function POST(_: NextRequest, { params }: Params) {
 
   await db.upvote.create({ data: { userId: session.user.id, projectId: id } })
   const count = await db.upvote.count({ where: { projectId: id } })
+
+  // Restore one submission credit to the author when their project hits the threshold (once only)
+  if (
+    count >= REVIEW_THRESHOLDS.UPVOTES_FOR_CREDIT &&
+    !project.creditRestored &&
+    project.status === "PUBLISHED"
+  ) {
+    await Promise.all([
+      db.project.update({ where: { id }, data: { creditRestored: true } }),
+      db.user.update({
+        where: { id: project.authorId },
+        data: {
+          submissionCredits: { increment: 1 },
+          reputationScore: { increment: 5 },
+        },
+      }),
+    ])
+  }
+
   return Response.json({ upvoted: true, count })
 }

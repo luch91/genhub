@@ -10,6 +10,14 @@ export async function createProject(formData: FormData) {
   const session = await auth()
   if (!session?.user) throw new Error("Unauthorized")
 
+  const author = await db.user.findUnique({
+    where: { id: session.user.id },
+    select: { submissionCredits: true },
+  })
+  if (!author || author.submissionCredits < 1) {
+    throw new Error("No submission credits remaining.")
+  }
+
   const raw = {
     title: formData.get("title"),
     tagline: formData.get("tagline"),
@@ -38,7 +46,7 @@ export async function createProject(formData: FormData) {
       contractAddress: contractAddress || null,
       repoUrl: repoUrl || null,
       demoUrl: demoUrl || null,
-      status: "PUBLISHED",
+      status: "PENDING_REVIEW",
       authorId: session.user.id,
       tags: {
         create: await Promise.all(
@@ -54,6 +62,11 @@ export async function createProject(formData: FormData) {
         ),
       },
     },
+  })
+
+  await db.user.update({
+    where: { id: session.user.id },
+    data: { submissionCredits: { decrement: 1 } },
   })
 
   redirect(`/projects/${project.slug}`)
