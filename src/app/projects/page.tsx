@@ -21,13 +21,7 @@ async function getProjects(tag?: string, sort?: string) {
   return db.project.findMany({
     where: {
       status: "PUBLISHED",
-      ...(tag
-        ? {
-            tags: {
-              some: { tag: { slug: tag } },
-            },
-          }
-        : {}),
+      ...(tag ? { tags: { some: { tag: { slug: tag } } } } : {}),
     },
     orderBy,
     include: {
@@ -46,8 +40,8 @@ export default async function ProjectsPage({ searchParams }: PageProps) {
     <div className="mx-auto max-w-6xl px-6 py-12">
       <div className="mb-8 flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-white">Projects</h1>
-          <p className="mt-1 text-slate-400">
+          <h1 className="font-display text-3xl font-black text-brand-navy">Projects</h1>
+          <p className="mt-1 text-brand-navy/50">
             {projects.length} project{projects.length !== 1 ? "s" : ""} built on GenLayer
           </p>
         </div>
@@ -56,7 +50,7 @@ export default async function ProjectsPage({ searchParams }: PageProps) {
         </Link>
       </div>
 
-      {/* Filters */}
+      {/* Tag filters */}
       <div className="mb-6 flex flex-wrap items-center gap-2">
         <FilterLink href="/projects" active={!tag} label="All" />
         {PREDEFINED_TAGS.map((t) => (
@@ -70,11 +64,11 @@ export default async function ProjectsPage({ searchParams }: PageProps) {
       </div>
 
       {/* Sort */}
-      <div className="mb-8 flex items-center gap-2 text-sm text-slate-500">
+      <div className="mb-8 flex items-center gap-2 text-sm text-brand-navy/45">
         <span>Sort:</span>
         <SortLink href="/projects" sort={sort} value={undefined} label="Newest" />
-        <SortLink href="/projects" sort={sort} value="upvoted" label="Most upvoted" />
-        <SortLink href="/projects" sort={sort} value="active" label="Most active" />
+        <SortLink href="/projects" sort={sort} value="upvoted"  label="Most upvoted" />
+        <SortLink href="/projects" sort={sort} value="active"   label="Most active" />
       </div>
 
       {projects.length > 0 ? (
@@ -84,9 +78,9 @@ export default async function ProjectsPage({ searchParams }: PageProps) {
           ))}
         </div>
       ) : (
-        <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-slate-800 py-16 text-center">
-          <p className="text-slate-500">No projects found for this filter.</p>
-          <Link href="/projects" className="mt-4 text-sm text-violet-400 hover:text-violet-300">
+        <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-brand-indigo/15 py-16 text-center">
+          <p className="text-brand-navy/45">No projects found for this filter.</p>
+          <Link href="/projects" className="mt-4 text-sm text-brand-indigo hover:text-brand-indigo/80 transition-colors">
             Clear filters
           </Link>
         </div>
@@ -95,22 +89,14 @@ export default async function ProjectsPage({ searchParams }: PageProps) {
   )
 }
 
-function FilterLink({
-  href,
-  active,
-  label,
-}: {
-  href: string
-  active: boolean
-  label: string
-}) {
+function FilterLink({ href, active, label }: { href: string; active: boolean; label: string }) {
   return (
     <Link
       href={href}
       className={
         active
-          ? "badge bg-violet-600 text-white"
-          : "badge border border-slate-700 bg-slate-800 text-slate-400 hover:border-slate-600 hover:text-slate-200"
+          ? "badge bg-brand-indigo text-white"
+          : "badge border border-brand-indigo/15 bg-white text-brand-navy/55 hover:border-brand-indigo/30 hover:text-brand-navy transition-colors"
       }
     >
       {label}
@@ -119,22 +105,16 @@ function FilterLink({
 }
 
 function SortLink({
-  href,
-  sort,
-  value,
-  label,
+  href, sort, value, label,
 }: {
-  href: string
-  sort: string | undefined
-  value: string | undefined
-  label: string
+  href: string; sort: string | undefined; value: string | undefined; label: string
 }) {
   const active = sort === value
   const url = value ? `${href}?sort=${value}` : href
   return (
     <Link
       href={url}
-      className={active ? "font-medium text-violet-400" : "hover:text-slate-300"}
+      className={active ? "font-medium text-brand-indigo" : "hover:text-brand-navy/70 transition-colors"}
     >
       {label}
     </Link>

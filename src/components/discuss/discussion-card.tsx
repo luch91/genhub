@@ -4,17 +4,17 @@ import type { DiscussionWithRelations } from "@/types"
 import { formatRelativeDate } from "@/lib/utils"
 
 const CATEGORY_LABELS = {
-  GENERAL: "General",
-  HELP: "Help",
-  IDEAS: "Ideas",
+  GENERAL:  "General",
+  HELP:     "Help",
+  IDEAS:    "Ideas",
   SHOWCASE: "Showcase",
 } as const
 
 const CATEGORY_COLORS = {
-  GENERAL: "bg-slate-800 text-slate-400",
-  HELP: "bg-blue-900/50 text-blue-300",
-  IDEAS: "bg-amber-900/50 text-amber-300",
-  SHOWCASE: "bg-violet-900/50 text-violet-300",
+  GENERAL:  "bg-brand-navy/10 text-brand-navy/55",
+  HELP:     "bg-blue-100 text-blue-700",
+  IDEAS:    "bg-amber-100 text-amber-700",
+  SHOWCASE: "bg-brand-indigo/10 text-brand-indigo",
 } as const
 
 type Props = { discussion: DiscussionWithRelations }
@@ -23,7 +23,7 @@ export function DiscussionCard({ discussion }: Props) {
   return (
     <Link
       href={`/discuss/${discussion.id}`}
-      className="card group flex flex-col gap-3 transition-colors hover:border-slate-700"
+      className="card group flex flex-col gap-3 transition-all hover:border-brand-indigo/25 hover:shadow-md"
     >
       <div className="flex items-start justify-between gap-3">
         <div className="flex-1">
@@ -32,19 +32,19 @@ export function DiscussionCard({ discussion }: Props) {
               {CATEGORY_LABELS[discussion.category]}
             </span>
             {discussion.pinned && (
-              <span className="text-xs text-slate-600">Pinned</span>
+              <span className="text-xs text-brand-navy/35">Pinned</span>
             )}
           </div>
-          <h3 className="font-medium text-slate-100 group-hover:text-white">
+          <h3 className="font-ui font-medium text-brand-navy group-hover:text-brand-indigo transition-colors">
             {discussion.title}
           </h3>
-          <p className="mt-1 line-clamp-2 text-sm text-slate-500">
+          <p className="mt-1 line-clamp-2 text-sm text-brand-navy/50">
             {discussion.content}
           </p>
         </div>
       </div>
 
-      <div className="flex items-center justify-between text-xs text-slate-600">
+      <div className="flex items-center justify-between text-xs text-brand-navy/40">
         <div className="flex items-center gap-2">
           {discussion.author.image && (
             <Image

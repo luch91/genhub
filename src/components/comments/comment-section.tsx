@@ -27,28 +27,25 @@ type Props = {
 export function CommentSection({ projectId, updateId, initialComments, currentUserId }: Props) {
   const router = useRouter()
   const [comments, setComments] = useState<Comment[]>(initialComments)
-  const [content, setContent] = useState("")
+  const [content, setContent]   = useState("")
   const [submitting, setSubmitting] = useState(false)
-  const [error, setError] = useState("")
+  const [error, setError]       = useState("")
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     if (!content.trim()) return
     setSubmitting(true)
     setError("")
-
     const res = await fetch("/api/comments", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ content, projectId, updateId }),
     })
-
     if (!res.ok) {
       setError("Failed to post comment. Are you signed in?")
       setSubmitting(false)
       return
     }
-
     const comment = await res.json()
     setComments((prev) => [...prev, comment])
     setContent("")
@@ -64,10 +61,12 @@ export function CommentSection({ projectId, updateId, initialComments, currentUs
   return (
     <div className="space-y-4">
       <h3 className="section-heading">
-        Comments {comments.length > 0 && <span className="text-slate-500">({comments.length})</span>}
+        Comments{" "}
+        {comments.length > 0 && (
+          <span className="text-brand-navy/45">({comments.length})</span>
+        )}
       </h3>
 
-      {/* Comment list */}
       {comments.length > 0 ? (
         <div className="space-y-3">
           {comments.map((comment) => (
@@ -81,35 +80,34 @@ export function CommentSection({ projectId, updateId, initialComments, currentUs
                   className="mt-0.5 flex-shrink-0 rounded-full"
                 />
               ) : (
-                <div className="mt-0.5 h-7 w-7 flex-shrink-0 rounded-full bg-slate-700" />
+                <div className="mt-0.5 h-7 w-7 flex-shrink-0 rounded-full bg-brand-indigo/15" />
               )}
               <div className="flex-1">
                 <div className="flex items-baseline gap-2">
-                  <span className="text-sm font-medium text-slate-300">
+                  <span className="text-sm font-medium text-brand-navy/80">
                     {comment.author.name ?? comment.author.username ?? "Builder"}
                   </span>
-                  <span className="text-xs text-slate-600">
+                  <span className="text-xs text-brand-navy/40">
                     {formatRelativeDate(new Date(comment.createdAt))}
                   </span>
                   {currentUserId === comment.author.id && (
                     <button
                       onClick={() => handleDelete(comment.id)}
-                      className="ml-auto text-xs text-slate-700 hover:text-red-400"
+                      className="ml-auto text-xs text-brand-navy/30 hover:text-red-500 transition-colors"
                     >
                       Delete
                     </button>
                   )}
                 </div>
-                <p className="mt-0.5 text-sm text-slate-400">{comment.content}</p>
+                <p className="mt-0.5 text-sm text-brand-navy/60">{comment.content}</p>
               </div>
             </div>
           ))}
         </div>
       ) : (
-        <p className="text-sm text-slate-600">No comments yet.</p>
+        <p className="text-sm text-brand-navy/40">No comments yet.</p>
       )}
 
-      {/* Post form */}
       {currentUserId ? (
         <form onSubmit={handleSubmit} className="flex gap-3">
           <textarea
@@ -119,20 +117,16 @@ export function CommentSection({ projectId, updateId, initialComments, currentUs
             rows={2}
             placeholder="Write a comment..."
           />
-          <button
-            type="submit"
-            disabled={submitting || !content.trim()}
-            className="btn-primary self-end"
-          >
+          <button type="submit" disabled={submitting || !content.trim()} className="btn-primary self-end">
             {submitting ? "..." : "Post"}
           </button>
         </form>
       ) : (
-        <p className="text-sm text-slate-600">
-          <a href="/login" className="text-violet-400 hover:text-violet-300">Sign in</a> to comment.
+        <p className="text-sm text-brand-navy/45">
+          <a href="/login" className="text-brand-indigo hover:text-brand-indigo/80 transition-colors">Sign in</a> to comment.
         </p>
       )}
-      {error && <p className="text-xs text-red-400">{error}</p>}
+      {error && <p className="text-xs text-red-500">{error}</p>}
     </div>
   )
 }

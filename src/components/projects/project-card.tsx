@@ -9,7 +9,7 @@ export function ProjectCard({ project }: Props) {
   return (
     <Link
       href={`/projects/${project.slug}`}
-      className="card group flex flex-col gap-4 transition-colors hover:border-slate-700"
+      className="card group flex flex-col gap-4 transition-all hover:border-brand-indigo/25 hover:shadow-md"
     >
       {/* Cover image */}
       {project.coverImage && (
@@ -29,7 +29,7 @@ export function ProjectCard({ project }: Props) {
         {project.tags.slice(0, 3).map(({ tag }) => (
           <span
             key={tag.id}
-            className="badge border border-slate-700 bg-slate-800 text-slate-500 text-xs"
+            className="badge border border-brand-indigo/15 bg-brand-indigo/5 text-brand-indigo/60 text-xs"
           >
             {tag.name}
           </span>
@@ -38,17 +38,17 @@ export function ProjectCard({ project }: Props) {
 
       {/* Title and tagline */}
       <div>
-        <h3 className="font-semibold text-slate-100 group-hover:text-white">
+        <h3 className="font-ui font-semibold text-brand-navy group-hover:text-brand-indigo transition-colors">
           {project.title}
           {project.verified && (
-            <span className="ml-2 text-xs text-emerald-400">✓</span>
+            <span className="ml-2 text-xs text-emerald-600">✓</span>
           )}
         </h3>
-        <p className="mt-1 line-clamp-2 text-sm text-slate-500">{project.tagline}</p>
+        <p className="mt-1 line-clamp-2 text-sm text-brand-navy/50">{project.tagline}</p>
       </div>
 
       {/* Footer */}
-      <div className="mt-auto flex items-center justify-between text-xs text-slate-600">
+      <div className="mt-auto flex items-center justify-between text-xs text-brand-navy/40">
         <div className="flex items-center gap-2">
           {project.author.image && (
             <Image
@@ -62,7 +62,7 @@ export function ProjectCard({ project }: Props) {
           <span>{project.author.name ?? project.author.username ?? "Builder"}</span>
         </div>
         <div className="flex items-center gap-3">
-          <span>{project._count.upvotes} ↑</span>
+          <span className="text-brand-indigo/60">{project._count.upvotes} ↑</span>
           <span>{project._count.updates} updates</span>
         </div>
       </div>

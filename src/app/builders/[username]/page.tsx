@@ -18,7 +18,7 @@ async function getBuilder(username: string) {
         orderBy: { createdAt: "desc" },
         include: {
           author: { select: { id: true, name: true, username: true, image: true } },
-          tags: { include: { tag: { select: { id: true, name: true, slug: true } } } },
+          tags:   { include: { tag: { select: { id: true, name: true, slug: true } } } },
           _count: { select: { upvotes: true, comments: true, updates: true } },
         },
       },
@@ -46,12 +46,7 @@ export default async function BuilderProfilePage({ params }: PageProps) {
     db.follow.count({ where: { followingId: builder.id } }),
     session?.user
       ? db.follow.findUnique({
-          where: {
-            followerId_followingId: {
-              followerId: session.user.id,
-              followingId: builder.id,
-            },
-          },
+          where: { followerId_followingId: { followerId: session.user.id!, followingId: builder.id } },
         }).then(Boolean)
       : Promise.resolve(false),
   ])
@@ -66,47 +61,35 @@ export default async function BuilderProfilePage({ params }: PageProps) {
             alt={builder.name ?? ""}
             width={80}
             height={80}
-            className="rounded-full"
+            className="rounded-full ring-2 ring-brand-indigo/15"
           />
         ) : (
-          <div className="h-20 w-20 flex-shrink-0 rounded-full bg-slate-800" />
+          <div className="h-20 w-20 flex-shrink-0 rounded-full bg-brand-indigo/15" />
         )}
 
         <div className="flex-1">
-          <h1 className="text-2xl font-bold text-white">{builder.name}</h1>
-          <p className="text-slate-500">@{builder.username}</p>
+          <h1 className="font-display text-2xl font-black text-brand-navy">{builder.name}</h1>
+          <p className="font-mono text-sm text-brand-navy/45">@{builder.username}</p>
           {builder.bio && (
-            <p className="mt-3 max-w-xl text-slate-400">{builder.bio}</p>
+            <p className="mt-3 max-w-xl text-brand-navy/55">{builder.bio}</p>
           )}
 
-          <div className="mt-4 flex flex-wrap gap-4 text-sm text-slate-500">
+          <div className="mt-4 flex flex-wrap gap-4 text-sm text-brand-navy/50">
             {builder.twitterHandle && (
-              <a
-                href={`https://twitter.com/${builder.twitterHandle}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="hover:text-violet-400"
-              >
+              <a href={`https://twitter.com/${builder.twitterHandle}`} target="_blank" rel="noopener noreferrer"
+                className="hover:text-brand-indigo transition-colors">
                 @{builder.twitterHandle}
               </a>
             )}
             {builder.githubHandle && (
-              <a
-                href={`https://github.com/${builder.githubHandle}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="hover:text-violet-400"
-              >
+              <a href={`https://github.com/${builder.githubHandle}`} target="_blank" rel="noopener noreferrer"
+                className="hover:text-brand-indigo transition-colors">
                 {builder.githubHandle}
               </a>
             )}
             {builder.website && (
-              <a
-                href={builder.website}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="hover:text-violet-400"
-              >
+              <a href={builder.website} target="_blank" rel="noopener noreferrer"
+                className="hover:text-brand-indigo transition-colors">
                 {builder.website.replace(/^https?:\/\//, "")}
               </a>
             )}
@@ -117,12 +100,12 @@ export default async function BuilderProfilePage({ params }: PageProps) {
         <div className="flex flex-col items-end gap-3">
           <div className="flex gap-6 text-center">
             <div>
-              <div className="text-xl font-bold text-white">{builder._count.projects}</div>
-              <div className="text-xs text-slate-500">Projects</div>
+              <div className="font-display text-xl font-black text-brand-navy">{builder._count.projects}</div>
+              <div className="text-xs text-brand-navy/45">Projects</div>
             </div>
             <div>
-              <div className="text-xl font-bold text-white">{builder._count.updates}</div>
-              <div className="text-xs text-slate-500">Updates</div>
+              <div className="font-display text-xl font-black text-brand-navy">{builder._count.updates}</div>
+              <div className="text-xs text-brand-navy/45">Updates</div>
             </div>
           </div>
           {session?.user?.id !== builder.id && (
@@ -138,9 +121,7 @@ export default async function BuilderProfilePage({ params }: PageProps) {
 
       {/* Projects */}
       <div>
-        <h2 className="section-heading mb-4">
-          Projects
-        </h2>
+        <h2 className="section-heading mb-4">Projects</h2>
         {builder.projects.length > 0 ? (
           <div className="grid gap-4 sm:grid-cols-2">
             {builder.projects.map((project) => (
@@ -148,8 +129,8 @@ export default async function BuilderProfilePage({ params }: PageProps) {
             ))}
           </div>
         ) : (
-          <div className="rounded-xl border border-dashed border-slate-800 py-12 text-center">
-            <p className="text-slate-500">No published projects yet.</p>
+          <div className="rounded-xl border border-dashed border-brand-indigo/15 py-12 text-center">
+            <p className="text-brand-navy/45">No published projects yet.</p>
           </div>
         )}
       </div>

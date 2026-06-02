@@ -32,14 +32,14 @@ export function FinalCTA() {
             Open to all GenLayer builders
           </div>
 
-          <h2 className="mb-6 text-5xl font-black leading-tight tracking-tight text-white md:text-7xl">
+          <h2 className="mb-6 text-5xl font-black leading-tight tracking-tight text-gray-900 md:text-7xl">
             Ready to build{" "}
             <span className="text-gradient-cyan">high-signal</span>
             <br />
             Intelligent Contracts?
           </h2>
 
-          <p className="mx-auto mb-10 max-w-xl text-lg text-slate-400">
+          <p className="mx-auto mb-10 max-w-xl text-lg text-gray-600">
             Join the community. Submit your first project. Earn your place in the
             GenLayer ecosystem — one approval at a time.
           </p>
@@ -60,7 +60,7 @@ export function FinalCTA() {
               <Link
                 href="/discuss"
                 onMouseEnter={() => play("hover")}
-                className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-8 py-4 text-base font-semibold text-white backdrop-blur-sm transition-all hover:border-white/20 hover:bg-white/10"
+                className="inline-flex items-center gap-2 rounded-xl border border-gray-300 bg-gray-50 px-8 py-4 text-base font-semibold text-gray-700 backdrop-blur-sm transition-all hover:border-gray-400 hover:bg-gray-100"
               >
                 Join the discussion
               </Link>

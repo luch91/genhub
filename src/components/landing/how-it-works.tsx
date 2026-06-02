@@ -1,176 +1,143 @@
 "use client"
 
-import { useRef, useEffect } from "react"
-import { motion } from "framer-motion"
+import { useRef, Fragment } from "react"
+import { motion, useInView } from "framer-motion"
+import { GlassCard } from "@/components/brand/glass-card"
+import { TileGrid } from "@/components/brand/tile-grid"
 import { useReducedMotion } from "@/hooks/use-reduced-motion"
+import type { TileColor } from "@/components/brand/mosaic-tile"
 
 const STEPS = [
   {
     number: "01",
-    label: "Submit",
-    title: "Submit your project",
+    label:  "Join the Hub",
+    title:  "Join the Hub",
     description:
-      "Spend one submission credit to submit your Intelligent Contract project. Include your contract address, repo, and explain why it's only possible on GenLayer.",
-    color: "#00F0FF",
-    icon: "📤",
+      "Create your builder profile. Connect your wallet. Tell us what you're building.",
+    nodeColors: [
+      ["amber","amber-lt","amber"],
+      ["amber-lt","amber","amber-lt"],
+      ["amber","amber-lt","amber"],
+    ] as (TileColor | null)[][],
+    color: "#fbbf24",
   },
   {
     number: "02",
-    label: "Pending Review",
-    title: "Community evaluates",
+    label:  "Share Your Work",
+    title:  "Share Your Work",
     description:
-      "Builders who have shipped their own projects review yours. They can approve or reject with feedback. Your project page shows live approval progress.",
-    color: "#B026FF",
-    icon: "👀",
+      "Submit a project, post an idea, or open a review request. The community is watching.",
+    nodeColors: [
+      ["indigo","indigo-3","indigo"],
+      ["indigo-3","indigo","indigo-3"],
+      ["indigo","indigo-3","indigo"],
+    ] as (TileColor | null)[][],
+    color: "#4f46e5",
   },
   {
     number: "03",
-    label: "3 Approvals",
-    title: "Quality gate passed",
+    label:  "Get Recognized",
+    title:  "Get Recognized",
     description:
-      "Three approvals from the community publish your project automatically. You earn +10 reputation. Rejection feedback tells you exactly what to improve.",
-    color: "#00FF94",
-    icon: "✅",
-  },
-  {
-    number: "04",
-    label: "Live on GenHub",
-    title: "Your project is live",
-    description:
-      "Now visible in the gallery. Builders discover it, upvote it, follow you. Hit 5 upvotes and you earn your submission credit back.",
-    color: "#00F0FF",
-    icon: "🚀",
+      "Community upvotes surface the best work. Top projects earn ecosystem visibility and foundation attention.",
+    nodeColors: [
+      ["amber","indigo","amber"],
+      ["indigo","lavender","indigo"],
+      ["amber","indigo","amber"],
+    ] as (TileColor | null)[][],
+    color: "#6366f1",
   },
 ]
 
-export function HowItWorks() {
+function StepConnector({ animate }: { animate: boolean }) {
+  return (
+    <div className="hidden items-center justify-center md:flex" aria-hidden="true">
+      <motion.div
+        className="h-px w-12"
+        style={{
+          backgroundImage:
+            "repeating-linear-gradient(90deg, rgba(79,70,229,0.35) 0px, rgba(79,70,229,0.35) 4px, transparent 4px, transparent 8px)",
+          transformOrigin: "left center",
+        }}
+        initial={animate ? { scaleX: 0, opacity: 0 } : { scaleX: 1, opacity: 1 }}
+        animate={{ scaleX: 1, opacity: 1 }}
+        transition={{ duration: 1.2, ease: "easeInOut", delay: 0.4 }}
+      />
+    </div>
+  )
+}
+
+export function HowItWorksSection() {
   const reduced = useReducedMotion()
-  const containerRef = useRef<HTMLDivElement>(null)
-  const trackRef = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    if (reduced) return
-
-    let ctx: import("gsap").Context | null = null
-
-    async function init() {
-      const [{ gsap }, { ScrollTrigger }] = await Promise.all([
-        import("gsap"),
-        import("gsap/ScrollTrigger"),
-      ])
-      gsap.registerPlugin(ScrollTrigger)
-
-      ctx = gsap.context(() => {
-        const track = trackRef.current
-        const container = containerRef.current
-        if (!track || !container) return
-
-        gsap.to(track, {
-          x: () => -(track.scrollWidth - window.innerWidth + 96),
-          ease: "none",
-          scrollTrigger: {
-            trigger: container,
-            pin: true,
-            scrub: 1,
-            start: "top top",
-            end: () => `+=${track.scrollWidth - window.innerWidth + 96}`,
-            invalidateOnRefresh: true,
-          },
-        })
-      })
-    }
-
-    init()
-
-    return () => {
-      ctx?.revert()
-    }
-  }, [reduced])
+  const sectionRef = useRef<HTMLElement>(null)
+  const inView = useInView(sectionRef, { once: true, margin: "-100px" })
 
   return (
-    <section className="bg-[#050505]" ref={containerRef}>
-      <div className="sticky top-0 flex min-h-screen flex-col justify-center overflow-hidden px-6 md:px-12">
-        {/* Section heading */}
+    <section id="how-it-works" ref={sectionRef} className="bg-brand-cream px-6 py-24">
+      <div className="mx-auto max-w-5xl">
+        {/* Header */}
         <motion.div
+          className="mb-16 text-center"
           initial={{ opacity: 0, y: 24 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
-          className="mb-10 flex-shrink-0"
         >
-          <div className="text-sm font-medium uppercase tracking-widest text-slate-500">
-            How it works
-          </div>
-          <h2 className="mt-2 text-4xl font-bold text-white md:text-5xl">
-            From idea to{" "}
-            <span className="text-gradient-green">published</span>
+          <span className="font-mono text-[11px] font-bold uppercase tracking-[0.18em] text-brand-indigo/50">
+            The Loop
+          </span>
+          <h2 className="mt-3 font-display text-4xl font-black text-brand-navy md:text-5xl">
+            How GenHub Works
           </h2>
         </motion.div>
 
-        {/* Horizontal track */}
-        <div
-          ref={trackRef}
-          className={`flex gap-6 ${reduced ? "flex-col md:flex-row md:flex-wrap" : ""}`}
-          style={{ width: reduced ? "100%" : `${STEPS.length * 440}px` }}
-        >
+        {/* Steps — horizontal on md+, vertical stack on mobile */}
+        <div className="grid grid-cols-1 items-start gap-6 md:grid-cols-[1fr_auto_1fr_auto_1fr] md:gap-4">
           {STEPS.map((step, i) => (
-            <motion.div
-              key={i}
-              initial={{ opacity: 0, y: 40 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-60px" }}
-              transition={{ duration: 0.6, delay: i * 0.1 }}
-              className="relative flex-shrink-0 rounded-2xl border border-white/[0.07] bg-[#0a0a0a] p-8"
-              style={{
-                width: reduced ? "100%" : "400px",
-                borderColor: `${step.color}18`,
-              }}
-            >
-              {/* Step number */}
-              <div
-                className="mb-6 font-mono text-6xl font-black leading-none"
-                style={{ color: step.color, opacity: 0.15 }}
+            <Fragment key={step.number}>
+              <motion.div
+                initial={reduced ? {} : { opacity: 0, y: 40 }}
+                animate={inView ? { opacity: 1, y: 0 } : { opacity: 0, y: 40 }}
+                transition={{ duration: 0.6, delay: i * 0.4, ease: [0.22, 1, 0.36, 1] }}
               >
-                {step.number}
-              </div>
+                <GlassCard className="h-full p-6">
+                  {/* Step node + badge */}
+                  <div className="mb-4 flex items-center gap-3">
+                    <TileGrid pattern={step.nodeColors} tileSize={16} gap={2} />
+                    <span
+                      className="rounded-pill px-2.5 py-0.5 font-mono text-xs font-bold"
+                      style={{
+                        background: `${step.color}18`,
+                        color: step.color,
+                        border: `1px solid ${step.color}30`,
+                      }}
+                    >
+                      {step.label}
+                    </span>
+                  </div>
 
-              {/* Icon + label */}
-              <div className="mb-4 flex items-center gap-3">
-                <span className="text-2xl">{step.icon}</span>
-                <span
-                  className="rounded-full px-3 py-0.5 text-xs font-medium"
-                  style={{
-                    background: `${step.color}15`,
-                    color: step.color,
-                    border: `1px solid ${step.color}30`,
-                  }}
-                >
-                  {step.label}
-                </span>
-              </div>
+                  {/* Big number */}
+                  <div
+                    className="mb-3 font-mono text-5xl font-black leading-none"
+                    style={{ color: step.color, opacity: 0.15 }}
+                    aria-hidden="true"
+                  >
+                    {step.number}
+                  </div>
 
-              <h3 className="mb-3 text-xl font-bold text-white">{step.title}</h3>
-              <p className="text-sm leading-relaxed text-slate-500">{step.description}</p>
+                  <h3 className="font-ui text-lg font-bold text-brand-navy">{step.title}</h3>
+                  <p className="mt-2 font-body text-sm leading-relaxed text-brand-navy/55">
+                    {step.description}
+                  </p>
+                </GlassCard>
+              </motion.div>
 
-              {/* Connector arrow (not on last) */}
-              {!reduced && i < STEPS.length - 1 && (
-                <div
-                  className="absolute -right-5 top-1/2 -translate-y-1/2 text-slate-700"
-                  style={{ zIndex: 10 }}
-                >
-                  →
-                </div>
+              {i < STEPS.length - 1 && (
+                <StepConnector animate={inView && !reduced} />
               )}
-            </motion.div>
+            </Fragment>
           ))}
         </div>
-
-        {/* Scroll hint — hidden on reduced */}
-        {!reduced && (
-          <p className="mt-8 flex-shrink-0 text-xs text-slate-700">
-            Scroll to explore →
-          </p>
-        )}
       </div>
     </section>
   )

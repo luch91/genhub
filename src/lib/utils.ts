@@ -72,8 +72,8 @@ export const REVIEW_THRESHOLDS = {
 } as const
 
 export const UPDATE_TYPE_COLORS = {
-  GENERAL: "bg-slate-800 text-slate-300",
-  MILESTONE: "bg-violet-900/50 text-violet-300",
-  BLOCKER: "bg-red-900/50 text-red-300",
-  BREAKTHROUGH: "bg-emerald-900/50 text-emerald-300",
+  GENERAL: "bg-gray-100 text-gray-600",
+  MILESTONE: "bg-violet-100 text-violet-700",
+  BLOCKER: "bg-red-100 text-red-700",
+  BREAKTHROUGH: "bg-emerald-100 text-emerald-700",
 } as const

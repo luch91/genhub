@@ -54,7 +54,7 @@ const STATS = [
 
 export function LiveStats({ stats }: Props) {
   return (
-    <section className="bg-[#050505] px-6 py-24">
+    <section className="bg-gray-50 px-6 py-24">
       <div className="mx-auto max-w-5xl">
         <motion.div
           initial={{ opacity: 0, y: 24 }}
@@ -63,10 +63,10 @@ export function LiveStats({ stats }: Props) {
           transition={{ duration: 0.6 }}
           className="mb-16 text-center"
         >
-          <div className="mb-3 text-sm font-medium uppercase tracking-widest text-slate-500">
+          <div className="mb-3 text-sm font-medium uppercase tracking-widest text-gray-500">
             Community Pulse
           </div>
-          <h2 className="text-4xl font-bold text-white md:text-5xl">
+          <h2 className="text-4xl font-bold text-gray-900 md:text-5xl">
             Growing every day
           </h2>
         </motion.div>
@@ -79,7 +79,7 @@ export function LiveStats({ stats }: Props) {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-60px" }}
               transition={{ duration: 0.6, delay: i * 0.15 }}
-              className="rounded-2xl border border-white/[0.06] bg-[#0a0a0a] px-8 py-10 text-center"
+              className="rounded-2xl border border-gray-200 bg-white px-8 py-10 text-center shadow-sm"
               style={{ borderColor: `${stat.color}18` }}
             >
               <div
@@ -88,7 +88,7 @@ export function LiveStats({ stats }: Props) {
               >
                 <Counter value={stats[stat.key]} suffix={stat.suffix} />
               </div>
-              <div className="text-sm text-slate-500">{stat.label}</div>
+              <div className="text-sm text-gray-500">{stat.label}</div>
 
               {/* Bottom glow bar */}
               <div className="mx-auto mt-6 h-px w-16 rounded-full" style={{ background: stat.color, opacity: 0.4 }} />

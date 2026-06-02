@@ -1,51 +1,56 @@
 import type { Metadata } from "next"
-import { Inter, JetBrains_Mono } from "next/font/google"
+import { Inter, JetBrains_Mono, Unbounded, Syne, DM_Sans, Space_Mono } from "next/font/google"
 import { Providers } from "./providers"
+import { LenisProvider } from "@/providers/lenis-provider"
+import { ConditionalShell } from "@/components/layout/conditional-shell"
 import { Header } from "@/components/layout/header"
 import { Footer } from "@/components/layout/footer"
-import { LenisProvider } from "@/providers/lenis-provider"
 import { SoundToggle } from "@/components/landing/sound-toggle"
 import "./globals.css"
 
-const inter = Inter({
-  subsets: ["latin"],
-  variable: "--font-inter",
-})
-
-const jetbrainsMono = JetBrains_Mono({
-  subsets: ["latin"],
-  variable: "--font-mono",
-})
+const inter        = Inter({ subsets: ["latin"], variable: "--font-inter" })
+const jetbrainsMono = JetBrains_Mono({ subsets: ["latin"], variable: "--font-jetbrains" })
+const unbounded    = Unbounded({ subsets: ["latin"], weight: ["900"], variable: "--font-unbounded" })
+const syne         = Syne({ subsets: ["latin"], weight: ["400", "700"], variable: "--font-syne" })
+const dmSans       = DM_Sans({ subsets: ["latin"], weight: ["300", "400"], variable: "--font-dm-sans" })
+const spaceMono    = Space_Mono({ subsets: ["latin"], weight: ["400", "700"], variable: "--font-space-mono" })
 
 export const metadata: Metadata = {
   title: {
-    default: "GenHub",
+    default: "GenHub — A Home for GenLayer Builders",
     template: "%s | GenHub",
   },
   description:
-    "The quality-gated home for GenLayer builders. Submit Intelligent Contract projects, build in public, and connect with the community.",
+    "The central community hub for GenLayer builders. Share projects, get upvoted, find collaborators, and shape the future of Intelligent Contracts.",
   openGraph: {
-    title: "GenHub",
-    description:
-      "The quality-gated home for GenLayer builders. Submit Intelligent Contract projects, build in public, and connect with the community.",
+    title: "GenHub — A Home for GenLayer Builders",
+    description: "A home for GenLayer builders.",
     type: "website",
   },
 }
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  const fontVars = [
+    inter.variable,
+    jetbrainsMono.variable,
+    unbounded.variable,
+    syne.variable,
+    dmSans.variable,
+    spaceMono.variable,
+  ].join(" ")
+
   return (
-    <html lang="en" className={`${inter.variable} ${jetbrainsMono.variable}`}>
-      <body className="flex min-h-screen flex-col">
+    <html lang="en" className={fontVars}>
+      <body>
         <Providers>
           <LenisProvider>
-            <Header />
-            <main className="flex-1">{children}</main>
-            <Footer />
-            <SoundToggle />
+            <ConditionalShell
+              header={<Header />}
+              footer={<Footer />}
+              soundToggle={<SoundToggle />}
+            >
+              {children}
+            </ConditionalShell>
           </LenisProvider>
         </Providers>
       </body>

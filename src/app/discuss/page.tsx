@@ -11,11 +11,11 @@ type PageProps = {
 }
 
 const CATEGORIES = [
-  { value: undefined, label: "All" },
-  { value: "GENERAL", label: "General" },
-  { value: "HELP", label: "Help" },
-  { value: "IDEAS", label: "Ideas" },
-  { value: "SHOWCASE", label: "Showcase" },
+  { value: undefined,   label: "All" },
+  { value: "GENERAL",   label: "General" },
+  { value: "HELP",      label: "Help" },
+  { value: "IDEAS",     label: "Ideas" },
+  { value: "SHOWCASE",  label: "Showcase" },
 ] as const
 
 const VALID_CATEGORIES = ["GENERAL", "HELP", "IDEAS", "SHOWCASE"] as const
@@ -41,15 +41,15 @@ export default async function DiscussPage({ searchParams }: PageProps) {
 
   return (
     <div className="mx-auto max-w-3xl px-6 py-12">
-      <div className="mb-8 flex items-center justify-between">
+      <div className="mb-8 flex items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-white">Discuss</h1>
-          <p className="mt-1 text-slate-400">
+          <h1 className="font-display text-3xl font-black text-brand-navy">Discuss</h1>
+          <p className="mt-1 text-brand-navy/50">
             Ask questions, share ideas, and connect with other builders.
           </p>
         </div>
         {session?.user && (
-          <Link href="/discuss/new" className="btn-primary">
+          <Link href="/discuss/new" className="btn-primary flex-shrink-0">
             New discussion
           </Link>
         )}
@@ -63,8 +63,8 @@ export default async function DiscussPage({ searchParams }: PageProps) {
             href={c.value ? `/discuss?category=${c.value}` : "/discuss"}
             className={
               category === c.value || (!category && !c.value)
-                ? "badge bg-violet-600 text-white"
-                : "badge border border-slate-700 bg-slate-800 text-slate-400 hover:border-slate-600 hover:text-slate-200"
+                ? "badge bg-brand-indigo text-white"
+                : "badge border border-brand-indigo/15 bg-white text-brand-navy/55 hover:border-brand-indigo/30 hover:text-brand-navy transition-colors"
             }
           >
             {c.label}
@@ -79,8 +79,8 @@ export default async function DiscussPage({ searchParams }: PageProps) {
           ))}
         </div>
       ) : (
-        <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-slate-800 py-16 text-center">
-          <p className="text-slate-500">No discussions yet.</p>
+        <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-brand-indigo/15 py-16 text-center">
+          <p className="text-brand-navy/45">No discussions yet.</p>
           {session?.user && (
             <Link href="/discuss/new" className="btn-primary mt-4">
               Start the first discussion

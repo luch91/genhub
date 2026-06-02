@@ -59,8 +59,7 @@ export function Hero() {
 
   return (
     <section
-      className="relative flex min-h-screen items-center justify-center overflow-hidden"
-      style={{ background: "#050505" }}
+      className="relative flex min-h-screen items-center justify-center overflow-hidden bg-white"
     >
       <ParallaxBackground />
 
@@ -77,7 +76,7 @@ export function Hero() {
         </motion.div>
 
         {/* Headline — character-by-character stagger */}
-        <h1 className="mb-6 text-5xl font-bold leading-tight tracking-tight md:text-7xl">
+        <h1 className="mb-6 text-5xl font-bold leading-tight tracking-tight text-gray-900 md:text-7xl">
           {HEADLINE.split(" ").map((word, wi) => (
             <span key={wi} className="mr-[0.22em] inline-block overflow-hidden">
               {word.split("").map((char) => {
@@ -111,7 +110,7 @@ export function Hero() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, delay: 1.4 }}
-          className="mx-auto mb-10 max-w-2xl text-lg text-slate-400 md:text-xl"
+          className="mx-auto mb-10 max-w-2xl text-lg text-gray-600 md:text-xl"
         >
           Submit Intelligent Contracts. Build in public.
           <br className="hidden md:block" />
@@ -151,7 +150,7 @@ export function Hero() {
           {/* Ghost CTA */}
           <Link
             href="/projects"
-            className="rounded-xl border border-slate-700 px-8 py-3.5 text-base font-semibold text-slate-300 transition-colors hover:border-slate-500 hover:text-white"
+            className="rounded-xl border border-gray-300 px-8 py-3.5 text-base font-semibold text-gray-700 transition-colors hover:border-gray-400 hover:text-gray-900"
             onMouseEnter={() => play("hover")}
           >
             Explore Projects
@@ -166,11 +165,11 @@ export function Hero() {
         transition={{ delay: 2.5 }}
         className="absolute bottom-8 left-1/2 flex -translate-x-1/2 flex-col items-center gap-2"
       >
-        <span className="text-xs text-slate-700">Scroll</span>
+        <span className="text-xs text-gray-400">Scroll</span>
         <motion.div
           animate={{ y: [0, 10, 0] }}
           transition={{ duration: 1.6, repeat: Infinity, ease: "easeInOut" }}
-          className="h-8 w-px bg-gradient-to-b from-slate-600 to-transparent"
+          className="h-8 w-px bg-gradient-to-b from-gray-300 to-transparent"
         />
       </motion.div>
     </section>

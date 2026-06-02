@@ -1,35 +1,30 @@
-import { db } from "@/lib/db"
-import { Hero } from "@/components/landing/hero"
-import { BentoGrid } from "@/components/landing/bento-grid"
-import { HowItWorks } from "@/components/landing/how-it-works"
-import { LiveStats } from "@/components/landing/live-stats"
-import { TechMarquee } from "@/components/landing/tech-marquee"
-import { FinalCTA } from "@/components/landing/final-cta"
+import { LandingNavbar }      from "@/components/landing/navbar"
+import { HeroSection }         from "@/components/landing/hero-section"
+import { ProofStrip }          from "@/components/landing/proof-strip"
+import { FeaturesSection }     from "@/components/landing/features-section"
+import { HowItWorksSection }   from "@/components/landing/how-it-works"
+import { ShowcaseSection }     from "@/components/landing/showcase-section"
+import { PricingSection }      from "@/components/landing/pricing-section"
+import { CTABanner }           from "@/components/landing/cta-banner"
+import { LandingFooter }       from "@/components/landing/landing-footer"
 
-async function getStats() {
-  try {
-    const [projectCount, builderCount, upvoteCount] = await Promise.all([
-      db.project.count({ where: { status: "PUBLISHED" } }),
-      db.user.count({ where: { username: { not: null } } }),
-      db.upvote.count(),
-    ])
-    return { projectCount, builderCount, upvoteCount }
-  } catch {
-    return { projectCount: 0, builderCount: 0, upvoteCount: 0 }
-  }
-}
-
-export default async function HomePage() {
-  const stats = await getStats()
-
+export default function HomePage() {
   return (
-    <div className="overflow-x-hidden" style={{ background: "#050505" }}>
-      <Hero />
-      <BentoGrid />
-      <HowItWorks />
-      <LiveStats stats={stats} />
-      <TechMarquee />
-      <FinalCTA />
-    </div>
+    <>
+      <a href="#main-content" className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[200] focus:rounded-lg focus:bg-brand-indigo focus:px-4 focus:py-2 focus:text-white">
+        Skip to main content
+      </a>
+      <LandingNavbar />
+      <main id="main-content">
+        <HeroSection />
+        <ProofStrip />
+        <FeaturesSection />
+        <HowItWorksSection />
+        <ShowcaseSection />
+        <PricingSection />
+        <CTABanner />
+      </main>
+      <LandingFooter />
+    </>
   )
 }

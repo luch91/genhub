@@ -54,7 +54,7 @@ function BentoCard({
         transformStyle: "preserve-3d",
         perspective: 800,
       }}
-      className={`relative overflow-hidden rounded-2xl border border-white/[0.07] bg-[#0a0a0a] p-6 transition-shadow duration-300 hover:shadow-[0_0_30px_rgba(0,240,255,0.06)] ${className}`}
+      className={`relative overflow-hidden rounded-2xl border border-gray-200 bg-white p-6 shadow-sm transition-shadow duration-300 hover:shadow-md ${className}`}
     >
       {/* Cursor-following glow border */}
       <div
@@ -90,8 +90,8 @@ function ReviewGateCard() {
           <div className="mb-2 text-xs font-medium uppercase tracking-widest text-[#00F0FF]">
             Community Review Gate
           </div>
-          <h3 className="text-xl font-bold text-white">3 Approvals to Ship</h3>
-          <p className="mt-2 text-sm text-slate-500">
+          <h3 className="text-xl font-bold text-gray-900">3 Approvals to Ship</h3>
+          <p className="mt-2 text-sm text-gray-500">
             Projects are community-reviewed before going live. No spam. High signal only.
           </p>
         </div>
@@ -103,8 +103,8 @@ function ReviewGateCard() {
             { label: "carol.eth", delay: 0.4 },
           ].map(({ label, delay }, i) => (
             <div key={i} className="flex items-center gap-3">
-              <span className="w-16 font-mono text-xs text-slate-600">{label}</span>
-              <div className="relative h-1.5 flex-1 overflow-hidden rounded-full bg-slate-800">
+              <span className="w-16 font-mono text-xs text-gray-500">{label}</span>
+              <div className="relative h-1.5 flex-1 overflow-hidden rounded-full bg-gray-200">
                 <motion.div
                   className="h-full rounded-full bg-[#00FF94]"
                   initial={{ width: "0%" }}
@@ -159,10 +159,10 @@ function TerminalCard() {
         <div className="mb-3 text-xs font-medium uppercase tracking-widest text-[#00FF94]">
           Build in Public
         </div>
-        <h3 className="mb-4 text-xl font-bold text-white">Live Feed</h3>
+        <h3 className="mb-4 text-xl font-bold text-gray-900">Live Feed</h3>
 
         {/* Terminal window */}
-        <div className="flex-1 overflow-hidden rounded-lg border border-slate-800 bg-[#050505] p-3">
+        <div className="flex-1 overflow-hidden rounded-lg border border-gray-200 bg-gray-50 p-3">
           <div className="mb-2 flex gap-1.5">
             <div className="h-2.5 w-2.5 rounded-full bg-red-500/60" />
             <div className="h-2.5 w-2.5 rounded-full bg-yellow-500/60" />
@@ -207,7 +207,7 @@ function CreditsCard() {
         <div className="mb-3 text-xs font-medium uppercase tracking-widest text-[#B026FF]">
           Reputation & Credits
         </div>
-        <h3 className="mb-4 text-lg font-bold text-white">Earn While You Build</h3>
+        <h3 className="mb-4 text-lg font-bold text-gray-900">Earn While You Build</h3>
 
         <div className="flex items-center gap-6">
           {/* Coin */}
@@ -228,10 +228,10 @@ function CreditsCard() {
           </motion.div>
 
           <div className="space-y-1 text-sm">
-            <div className="text-slate-400">
+            <div className="text-gray-600">
               Credits: <span className="font-semibold text-[#B026FF]">{credits}</span>
             </div>
-            <div className="text-slate-400">
+            <div className="text-gray-600">
               Reputation:{" "}
               <motion.span
                 key={rep}
@@ -242,7 +242,7 @@ function CreditsCard() {
                 {rep}
               </motion.span>
             </div>
-            <div className="text-xs text-slate-600">Hover to earn →</div>
+            <div className="text-xs text-gray-400">Hover to earn →</div>
           </div>
         </div>
       </div>
@@ -273,7 +273,7 @@ function NetworkCard() {
         <div className="mb-2 text-xs font-medium uppercase tracking-widest text-[#00F0FF]">
           Builder Network
         </div>
-        <h3 className="mb-3 text-xl font-bold text-white">Connect. Collaborate. Build.</h3>
+        <h3 className="mb-3 text-xl font-bold text-gray-900">Connect. Collaborate. Build.</h3>
 
         <div className="flex-1">
           <svg width="100%" viewBox="0 0 430 200" className="overflow-visible">
@@ -316,7 +316,7 @@ function NetworkCard() {
 
 export function BentoGrid() {
   return (
-    <section className="bg-[#050505] px-6 py-24">
+    <section className="bg-gray-50 px-6 py-24">
       <div className="mx-auto max-w-5xl">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -325,10 +325,10 @@ export function BentoGrid() {
           transition={{ duration: 0.7 }}
           className="mb-12 text-center"
         >
-          <div className="mb-3 text-sm font-medium uppercase tracking-widest text-slate-500">
+          <div className="mb-3 text-sm font-medium uppercase tracking-widest text-gray-500">
             Platform Features
           </div>
-          <h2 className="text-4xl font-bold text-white md:text-5xl">
+          <h2 className="text-4xl font-bold text-gray-900 md:text-5xl">
             Built for{" "}
             <span className="text-gradient-cyan">serious builders</span>
           </h2>

@@ -81,7 +81,7 @@ export function ParallaxBackground() {
             style={{
               left: `${10 + (i * 14) % 75}%`,
               top: `${15 + (i * 17) % 70}%`,
-              color: i % 2 === 0 ? "rgba(0,240,255,0.12)" : "rgba(0,255,148,0.1)",
+              color: i % 2 === 0 ? "rgba(0,180,255,0.22)" : "rgba(0,200,120,0.18)",
               transform: `rotate(${(i % 3) - 1}deg)`,
               whiteSpace: "nowrap",
             }}
@@ -92,7 +92,7 @@ export function ParallaxBackground() {
       </motion.div>
 
       {/* Radial fade at bottom */}
-      <div className="absolute inset-x-0 bottom-0 h-48 bg-gradient-to-t from-[#050505] to-transparent" />
+      <div className="absolute inset-x-0 bottom-0 h-48 bg-gradient-to-t from-white to-transparent" />
     </motion.div>
   )
 }

@@ -11,19 +11,17 @@ type Props = {
 
 export function FollowButton({ username, initialFollowing, initialCount, currentUserId }: Props) {
   const [following, setFollowing] = useState(initialFollowing)
-  const [count, setCount] = useState(initialCount)
-  const [loading, setLoading] = useState(false)
-  const [hovered, setHovered] = useState(false)
+  const [count, setCount]         = useState(initialCount)
+  const [loading, setLoading]     = useState(false)
+  const [hovered, setHovered]     = useState(false)
 
   if (!currentUserId) {
     return (
       <div className="flex items-center gap-3">
-        <span className="text-sm text-slate-500">
+        <span className="text-sm text-brand-navy/50">
           {count} {count === 1 ? "follower" : "followers"}
         </span>
-        <a href="/login" className="btn-primary text-sm">
-          Follow
-        </a>
+        <a href="/login" className="btn-primary text-sm">Follow</a>
       </div>
     )
   }
@@ -41,7 +39,7 @@ export function FollowButton({ username, initialFollowing, initialCount, current
 
   return (
     <div className="flex items-center gap-3">
-      <span className="text-sm text-slate-500">
+      <span className="text-sm text-brand-navy/50">
         {count} {count === 1 ? "follower" : "followers"}
       </span>
       <button
@@ -52,7 +50,7 @@ export function FollowButton({ username, initialFollowing, initialCount, current
         className={
           following
             ? hovered
-              ? "btn-secondary text-sm text-red-400 hover:border-red-700"
+              ? "btn-secondary text-sm text-red-500 hover:border-red-300"
               : "btn-secondary text-sm"
             : "btn-primary text-sm"
         }

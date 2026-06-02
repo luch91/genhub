@@ -27,7 +27,7 @@ export function SoundToggle() {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 3 }}
-      className="glass fixed bottom-6 right-6 z-50 flex items-center gap-2 rounded-full px-4 py-2 text-xs font-medium text-slate-400 transition-colors hover:text-slate-200"
+      className="glass fixed bottom-6 right-6 z-50 flex items-center gap-2 rounded-full px-4 py-2 text-xs font-medium text-gray-500 transition-colors hover:text-gray-700"
       title={muted ? "Enable sound" : "Mute sound"}
     >
       {muted ? <MutedIcon /> : <SoundIcon />}

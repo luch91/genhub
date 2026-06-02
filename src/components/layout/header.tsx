@@ -15,32 +15,26 @@ export async function Header() {
   ])
 
   return (
-    <header className="sticky top-0 z-50 border-b border-slate-800 bg-background/80 backdrop-blur">
+    <header className="sticky top-0 z-50 border-b border-brand-indigo/10 bg-brand-cream/95 backdrop-blur">
       <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-6">
         {/* Logo */}
-        <Link href="/" className="flex items-center gap-2 font-semibold text-white">
-          <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-violet-600 text-xs font-bold">
-            GL
-          </span>
-          <span className="hidden sm:inline">Builders Hub</span>
+        <Link href="/" className="flex items-center gap-2.5">
+          <div className="grid grid-cols-3 gap-0.5" aria-hidden="true">
+            {["#fbbf24","#fbbf24","#fbbf24","#fbbf24","#1a1a2e","#fbbf24","#4f46e5","#4f46e5","#4f46e5"].map((c, i) => (
+              <span key={i} className="rounded-[2px]" style={{ width: 7, height: 7, backgroundColor: c }} />
+            ))}
+          </div>
+          <span className="font-ui text-sm font-bold text-brand-navy hidden sm:inline">GenHub</span>
         </Link>
 
         {/* Nav */}
         <nav className="flex items-center gap-1">
-          <Link href="/projects" className="btn-ghost py-1.5 text-sm">
-            Projects
-          </Link>
-          <Link href="/builders" className="btn-ghost py-1.5 text-sm">
-            Builders
-          </Link>
-          <Link href="/feed" className="btn-ghost py-1.5 text-sm">
-            Feed
-          </Link>
-          <Link href="/discuss" className="btn-ghost py-1.5 text-sm">
-            Discuss
-          </Link>
+          <Link href="/projects" className="btn-ghost py-1.5 text-sm">Projects</Link>
+          <Link href="/builders" className="btn-ghost py-1.5 text-sm">Builders</Link>
+          <Link href="/feed"     className="btn-ghost py-1.5 text-sm">Feed</Link>
+          <Link href="/discuss"  className="btn-ghost py-1.5 text-sm">Discuss</Link>
           {eligible && (
-            <Link href="/review" className="btn-ghost py-1.5 text-sm text-amber-400 hover:text-amber-300">
+            <Link href="/review" className="btn-ghost py-1.5 text-sm font-medium text-brand-amber-dk hover:text-brand-amber-dk">
               Review
             </Link>
           )}
@@ -81,11 +75,11 @@ function UserMenu({
             alt={user.name ?? ""}
             width={28}
             height={28}
-            className="rounded-full"
+            className="rounded-full ring-2 ring-brand-indigo/20"
           />
         </Link>
       ) : (
-        <div className="h-7 w-7 rounded-full bg-slate-700" />
+        <div className="h-7 w-7 rounded-full bg-brand-indigo/15" />
       )}
       <form
         action={async () => {

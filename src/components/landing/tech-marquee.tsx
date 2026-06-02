@@ -22,8 +22,8 @@ function MarqueeItem({ name, hoverColor }: { name: string; hoverColor: string })
     <div
       className="flex flex-shrink-0 items-center gap-2 rounded-full border px-5 py-2 text-sm font-medium transition-all duration-300 cursor-default select-none"
       style={{
-        borderColor: hovered ? `${hoverColor}40` : "rgba(255,255,255,0.06)",
-        color: hovered ? hoverColor : "#555",
+        borderColor: hovered ? `${hoverColor}40` : "rgba(0,0,0,0.1)",
+        color: hovered ? hoverColor : "#6B7280",
         background: hovered ? `${hoverColor}0a` : "transparent",
         boxShadow: hovered ? `0 0 16px ${hoverColor}25` : "none",
       }}
@@ -32,7 +32,7 @@ function MarqueeItem({ name, hoverColor }: { name: string; hoverColor: string })
     >
       <span
         className="h-2 w-2 rounded-full transition-colors duration-300"
-        style={{ background: hovered ? hoverColor : "#333" }}
+        style={{ background: hovered ? hoverColor : "#9CA3AF" }}
       />
       {name}
     </div>
@@ -43,9 +43,9 @@ export function TechMarquee() {
   const doubled = [...ITEMS, ...ITEMS]
 
   return (
-    <section className="bg-[#050505] py-20">
+    <section className="bg-gray-50 py-20">
       <div className="mb-10 text-center">
-        <div className="text-sm font-medium uppercase tracking-widest text-slate-600">
+        <div className="text-sm font-medium uppercase tracking-widest text-gray-500">
           Powered by
         </div>
       </div>
@@ -53,9 +53,9 @@ export function TechMarquee() {
       {/* Marquee with fade masks */}
       <div className="relative overflow-hidden">
         {/* Left fade */}
-        <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-24 bg-gradient-to-r from-[#050505] to-transparent" />
+        <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-24 bg-gradient-to-r from-gray-50 to-transparent" />
         {/* Right fade */}
-        <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-24 bg-gradient-to-l from-[#050505] to-transparent" />
+        <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-24 bg-gradient-to-l from-gray-50 to-transparent" />
 
         <div className="animate-marquee flex gap-4 py-2" style={{ width: "max-content" }}>
           {doubled.map((item, i) => (
