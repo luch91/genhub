@@ -2,10 +2,17 @@ import Link from "next/link"
 import Image from "next/image"
 import { auth, signOut } from "@/lib/auth"
 import { canReview } from "@/lib/review"
+import { db } from "@/lib/db"
+import { NotificationBell } from "@/components/notifications/notification-bell"
 
 export async function Header() {
   const session = await auth()
-  const eligible = session?.user ? await canReview(session.user.id) : false
+  const [eligible, unreadCount] = await Promise.all([
+    session?.user ? canReview(session.user.id) : Promise.resolve(false),
+    session?.user
+      ? db.notification.count({ where: { userId: session.user.id, read: false } })
+      : Promise.resolve(0),
+  ])
 
   return (
     <header className="sticky top-0 z-50 border-b border-slate-800 bg-background/80 backdrop-blur">
@@ -46,6 +53,7 @@ export async function Header() {
               <Link href="/projects/submit" className="btn-primary hidden py-1.5 text-sm sm:inline-flex">
                 Submit
               </Link>
+              <NotificationBell initialCount={unreadCount} />
               <UserMenu user={session.user} />
             </>
           ) : (

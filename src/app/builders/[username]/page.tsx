@@ -2,7 +2,9 @@ import type { Metadata } from "next"
 import { notFound } from "next/navigation"
 import Image from "next/image"
 import { db } from "@/lib/db"
+import { auth } from "@/lib/auth"
 import { ProjectCard } from "@/components/projects/project-card"
+import { FollowButton } from "@/components/builders/follow-button"
 import { formatDate } from "@/lib/utils"
 
 type PageProps = { params: Promise<{ username: string }> }
@@ -37,8 +39,22 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function BuilderProfilePage({ params }: PageProps) {
   const { username } = await params
-  const builder = await getBuilder(username)
+  const [builder, session] = await Promise.all([getBuilder(username), auth()])
   if (!builder) notFound()
+
+  const [followerCount, isFollowing] = await Promise.all([
+    db.follow.count({ where: { followingId: builder.id } }),
+    session?.user
+      ? db.follow.findUnique({
+          where: {
+            followerId_followingId: {
+              followerId: session.user.id,
+              followingId: builder.id,
+            },
+          },
+        }).then(Boolean)
+      : Promise.resolve(false),
+  ])
 
   return (
     <div className="mx-auto max-w-4xl px-6 py-12">
@@ -98,15 +114,25 @@ export default async function BuilderProfilePage({ params }: PageProps) {
           </div>
         </div>
 
-        <div className="flex gap-6 text-center">
-          <div>
-            <div className="text-xl font-bold text-white">{builder._count.projects}</div>
-            <div className="text-xs text-slate-500">Projects</div>
+        <div className="flex flex-col items-end gap-3">
+          <div className="flex gap-6 text-center">
+            <div>
+              <div className="text-xl font-bold text-white">{builder._count.projects}</div>
+              <div className="text-xs text-slate-500">Projects</div>
+            </div>
+            <div>
+              <div className="text-xl font-bold text-white">{builder._count.updates}</div>
+              <div className="text-xs text-slate-500">Updates</div>
+            </div>
           </div>
-          <div>
-            <div className="text-xl font-bold text-white">{builder._count.updates}</div>
-            <div className="text-xs text-slate-500">Updates</div>
-          </div>
+          {session?.user?.id !== builder.id && (
+            <FollowButton
+              username={builder.username!}
+              initialFollowing={isFollowing}
+              initialCount={followerCount}
+              currentUserId={session?.user?.id}
+            />
+          )}
         </div>
       </div>
 

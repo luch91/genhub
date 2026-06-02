@@ -74,6 +74,9 @@ model User {
   discussions     Discussion[]
   replies         Reply[]
   projectReviews  ProjectReview[]
+  following       Follow[]       @relation("Follower")
+  followers       Follow[]       @relation("Following")
+  notifications   Notification[]
 }
 
 enum ProjectStatus {
@@ -164,6 +167,42 @@ model Comment {
 
   updateId String?
   update   ProjectUpdate? @relation(fields: [updateId], references: [id], onDelete: Cascade)
+}
+
+model Follow {
+  id          String   @id @default(cuid())
+  createdAt   DateTime @default(now())
+
+  followerId  String
+  follower    User     @relation("Follower", fields: [followerId], references: [id], onDelete: Cascade)
+
+  followingId String
+  following   User     @relation("Following", fields: [followingId], references: [id], onDelete: Cascade)
+
+  @@unique([followerId, followingId])
+}
+
+enum NotificationType {
+  FOLLOW
+  PROJECT_REVIEW
+  PROJECT_PUBLISHED
+  PROJECT_REJECTED
+  NEW_UPDATE
+  NEW_PROJECT
+  COMMENT
+  DISCUSSION_REPLY
+}
+
+model Notification {
+  id        String           @id @default(cuid())
+  type      NotificationType
+  message   String
+  link      String?
+  read      Boolean          @default(false)
+  createdAt DateTime         @default(now())
+
+  userId    String
+  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 enum ReviewDecision {

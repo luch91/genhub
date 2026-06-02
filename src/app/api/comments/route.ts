@@ -2,6 +2,7 @@ import { NextRequest } from "next/server"
 import { auth } from "@/lib/auth"
 import { db } from "@/lib/db"
 import { commentSchema } from "@/lib/validations"
+import { notifyUser } from "@/lib/notifications"
 
 export async function POST(request: NextRequest) {
   const session = await auth()
@@ -30,6 +31,27 @@ export async function POST(request: NextRequest) {
       author: { select: { id: true, name: true, username: true, image: true } },
     },
   })
+
+  // Notify project author (if comment is on a project and they're not the commenter)
+  if (projectId) {
+    const project = await db.project.findUnique({
+      where: { id: projectId },
+      select: { authorId: true, title: true, slug: true },
+    })
+    if (project && project.authorId !== session.user.id) {
+      const me = await db.user.findUnique({
+        where: { id: session.user.id },
+        select: { name: true, username: true },
+      })
+      const actorName = me?.name ?? me?.username ?? "Someone"
+      await notifyUser(
+        project.authorId,
+        "COMMENT",
+        `${actorName} commented on your project "${project.title}"`,
+        `/projects/${project.slug}`
+      )
+    }
+  }
 
   return Response.json(comment, { status: 201 })
 }

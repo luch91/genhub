@@ -2,6 +2,7 @@ import { NextRequest } from "next/server"
 import { auth } from "@/lib/auth"
 import { db } from "@/lib/db"
 import { projectUpdateSchema } from "@/lib/validations"
+import { notifyFollowers } from "@/lib/notifications"
 
 const VALID_TYPES = ["GENERAL", "MILESTONE", "BLOCKER", "BREAKTHROUGH"] as const
 
@@ -68,6 +69,19 @@ export async function POST(request: NextRequest) {
       _count: { select: { comments: true } },
     },
   })
+
+  const me = await db.user.findUnique({
+    where: { id: session.user.id },
+    select: { name: true, username: true },
+  })
+  const actorName = me?.name ?? me?.username ?? "A builder"
+
+  await notifyFollowers(
+    session.user.id,
+    "NEW_UPDATE",
+    `${actorName} posted an update on "${update.project.title}"`,
+    `/projects/${update.project.slug}`
+  )
 
   return Response.json(update, { status: 201 })
 }

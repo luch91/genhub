@@ -3,6 +3,7 @@ import { auth } from "@/lib/auth"
 import { db } from "@/lib/db"
 import { canReview } from "@/lib/review"
 import { REVIEW_THRESHOLDS } from "@/lib/utils"
+import { notifyUser } from "@/lib/notifications"
 
 type Params = { params: Promise<{ id: string }> }
 
@@ -78,14 +79,35 @@ export async function POST(request: NextRequest, { params }: Params) {
         where: { id: project.authorId },
         data: { reputationScore: { increment: 10 } },
       }),
+      notifyUser(
+        project.authorId,
+        "PROJECT_PUBLISHED",
+        `Your project "${project.title}" is now live!`,
+        `/projects/${project.slug}`
+      ),
     ])
     return Response.json({ status: "PUBLISHED", approvals, rejections }, { status: 201 })
   }
 
   if (rejections >= REVIEW_THRESHOLDS.REJECTIONS_NEEDED) {
-    await db.project.update({ where: { id }, data: { status: "DRAFT" } })
+    await Promise.all([
+      db.project.update({ where: { id }, data: { status: "DRAFT" } }),
+      notifyUser(
+        project.authorId,
+        "PROJECT_REJECTED",
+        `Your project "${project.title}" was sent back for revision`,
+        `/projects/${project.slug}`
+      ),
+    ])
     return Response.json({ status: "DRAFT", approvals, rejections }, { status: 201 })
   }
+
+  await notifyUser(
+    project.authorId,
+    "PROJECT_REVIEW",
+    `Your project "${project.title}" received a new review (${approvals}/3 approvals)`,
+    `/projects/${project.slug}`
+  )
 
   return Response.json({ status: "PENDING_REVIEW", approvals, rejections }, { status: 201 })
 }

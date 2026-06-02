@@ -2,6 +2,7 @@ import { NextRequest } from "next/server"
 import { auth } from "@/lib/auth"
 import { db } from "@/lib/db"
 import { replySchema } from "@/lib/validations"
+import { notifyUser } from "@/lib/notifications"
 
 type Params = { params: Promise<{ id: string }> }
 
@@ -30,10 +31,21 @@ export async function POST(request: NextRequest, { params }: Params) {
     },
   })
 
-  await db.discussion.update({
-    where: { id },
-    data: { updatedAt: new Date() },
-  })
+  await db.discussion.update({ where: { id }, data: { updatedAt: new Date() } })
+
+  if (discussion.authorId !== session.user.id) {
+    const me = await db.user.findUnique({
+      where: { id: session.user.id },
+      select: { name: true, username: true },
+    })
+    const actorName = me?.name ?? me?.username ?? "Someone"
+    await notifyUser(
+      discussion.authorId,
+      "DISCUSSION_REPLY",
+      `${actorName} replied to your discussion "${discussion.title}"`,
+      `/discuss/${id}`
+    )
+  }
 
   return Response.json(reply, { status: 201 })
 }
