@@ -27,6 +27,9 @@ export async function Header() {
           <Link href="/feed" className="btn-ghost py-1.5 text-sm">
             Feed
           </Link>
+          <Link href="/discuss" className="btn-ghost py-1.5 text-sm">
+            Discuss
+          </Link>
         </nav>
 
         {/* Auth */}

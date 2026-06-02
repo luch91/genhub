@@ -60,6 +60,29 @@ export const commentSchema = z.object({
 
 export type CommentInput = z.infer<typeof commentSchema>
 
+export const discussionSchema = z.object({
+  title: z
+    .string()
+    .min(5, "Title must be at least 5 characters")
+    .max(150, "Title must be 150 characters or less"),
+  content: z
+    .string()
+    .min(10, "Content must be at least 10 characters")
+    .max(5000, "Content must be 5000 characters or less"),
+  category: z.enum(["GENERAL", "HELP", "IDEAS", "SHOWCASE"]),
+})
+
+export type DiscussionInput = z.infer<typeof discussionSchema>
+
+export const replySchema = z.object({
+  content: z
+    .string()
+    .min(1, "Reply cannot be empty")
+    .max(2000, "Reply must be 2000 characters or less"),
+})
+
+export type ReplyInput = z.infer<typeof replySchema>
+
 export const builderProfileSchema = z.object({
   username: z
     .string()

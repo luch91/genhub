@@ -20,6 +20,9 @@ export function Footer() {
           <Link href="/feed" className="hover:text-slate-400">
             Feed
           </Link>
+          <Link href="/discuss" className="hover:text-slate-400">
+            Discuss
+          </Link>
           <a
             href="https://genlayer.com"
             target="_blank"

@@ -1,6 +1,6 @@
-import type { Project, User, ProjectUpdate, Tag, Comment, Upvote } from "@prisma/client"
+import type { Project, User, ProjectUpdate, Tag, Comment, Upvote, Discussion, Reply } from "@prisma/client"
 
-export type { ProjectStatus, UpdateType } from "@prisma/client"
+export type { ProjectStatus, UpdateType, DiscussionCategory } from "@prisma/client"
 
 export type ProjectWithRelations = Project & {
   author: Pick<User, "id" | "name" | "username" | "image">
@@ -24,6 +24,21 @@ export type CommentWithAuthor = Comment & {
 
 export type UpvoteWithUser = Upvote & {
   user: Pick<User, "id">
+}
+
+export type DiscussionWithRelations = Discussion & {
+  author: Pick<User, "id" | "name" | "username" | "image">
+  _count: { replies: number }
+}
+
+export type ReplyWithAuthor = Reply & {
+  author: Pick<User, "id" | "name" | "username" | "image">
+}
+
+export type DiscussionWithReplies = Discussion & {
+  author: Pick<User, "id" | "name" | "username" | "image">
+  replies: ReplyWithAuthor[]
+  _count: { replies: number }
 }
 
 export type PaginatedResponse<T> = {

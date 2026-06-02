@@ -3,7 +3,9 @@ import { notFound } from "next/navigation"
 import Image from "next/image"
 import Link from "next/link"
 import { db } from "@/lib/db"
+import { auth } from "@/lib/auth"
 import { formatDate, UPDATE_TYPE_LABELS, UPDATE_TYPE_COLORS } from "@/lib/utils"
+import { CommentSection } from "@/components/comments/comment-section"
 
 type PageProps = { params: Promise<{ slug: string }> }
 
@@ -18,6 +20,12 @@ async function getProject(slug: string) {
         include: {
           author: { select: { id: true, name: true, username: true, image: true } },
           _count: { select: { comments: true } },
+        },
+      },
+      comments: {
+        orderBy: { createdAt: "asc" },
+        include: {
+          author: { select: { id: true, name: true, username: true, image: true } },
         },
       },
       _count: { select: { upvotes: true, comments: true, updates: true } },
@@ -37,7 +45,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function ProjectPage({ params }: PageProps) {
   const { slug } = await params
-  const project = await getProject(slug)
+  const [project, session] = await Promise.all([getProject(slug), auth()])
   if (!project) notFound()
 
   return (
@@ -116,6 +124,15 @@ export default async function ProjectPage({ params }: PageProps) {
               </div>
             </div>
           )}
+
+          {/* Comments */}
+          <div className="card">
+            <CommentSection
+              projectId={project.id}
+              initialComments={project.comments}
+              currentUserId={session?.user?.id}
+            />
+          </div>
         </div>
 
         {/* Sidebar */}
