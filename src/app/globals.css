@@ -4,6 +4,7 @@
 
 @layer base {
   :root {
+    /* App shell tokens */
     --background: 222 47% 4%;
     --surface: 222 40% 7%;
     --border: 222 30% 13%;
@@ -13,6 +14,12 @@
     --muted-foreground: 215 20% 55%;
     --accent: 262 60% 20%;
     --accent-foreground: 262 83% 80%;
+
+    /* Landing page neon palette */
+    --cyan: #00F0FF;
+    --purple: #B026FF;
+    --green: #00FF94;
+    --space: #050505;
   }
 
   * {
@@ -67,5 +74,103 @@
 
   .section-heading {
     @apply text-lg font-semibold text-slate-100;
+  }
+
+  /* Landing — cyber grid background */
+  .cyber-grid {
+    background-image:
+      linear-gradient(rgba(0, 240, 255, 0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0, 240, 255, 0.04) 1px, transparent 1px);
+    background-size: 48px 48px;
+  }
+
+  /* Landing — glassmorphism surface */
+  .glass {
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.07);
+  }
+}
+
+@layer utilities {
+  /* Gradient text utility */
+  .text-gradient-cyan {
+    background: linear-gradient(135deg, #00F0FF, #B026FF);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .text-gradient-green {
+    background: linear-gradient(135deg, #00FF94, #00F0FF);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* Glow utilities */
+  .glow-cyan {
+    box-shadow: 0 0 20px rgba(0, 240, 255, 0.25), 0 0 40px rgba(0, 240, 255, 0.1);
+  }
+
+  .glow-purple {
+    box-shadow: 0 0 20px rgba(176, 38, 255, 0.25), 0 0 40px rgba(176, 38, 255, 0.1);
+  }
+
+  .glow-green {
+    box-shadow: 0 0 20px rgba(0, 255, 148, 0.25), 0 0 40px rgba(0, 255, 148, 0.1);
+  }
+}
+
+/* Terminal auto-scroll animation */
+@keyframes terminal-scroll {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(-50%); }
+}
+
+.animate-terminal-scroll {
+  animation: terminal-scroll 12s linear infinite;
+}
+
+/* Marquee animation */
+@keyframes marquee-left {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+.animate-marquee {
+  animation: marquee-left 25s linear infinite;
+}
+
+/* Gradient mesh animation */
+@keyframes mesh-shift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+.animate-mesh {
+  background: linear-gradient(-45deg, #050505, #0d0018, #001408, #0a000d, #050505);
+  background-size: 400% 400%;
+  animation: mesh-shift 12s ease infinite;
+}
+
+/* Floating glow orb */
+@keyframes float-orb {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-20px) scale(1.05); }
+}
+
+.animate-float {
+  animation: float-orb 6s ease-in-out infinite;
+}
+
+/* Reduced motion overrides */
+@media (prefers-reduced-motion: reduce) {
+  .animate-terminal-scroll,
+  .animate-marquee,
+  .animate-mesh,
+  .animate-float {
+    animation: none !important;
   }
 }

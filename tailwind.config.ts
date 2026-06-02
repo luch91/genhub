@@ -24,6 +24,13 @@ const config: Config = {
           DEFAULT: "hsl(var(--accent))",
           foreground: "hsl(var(--accent-foreground))",
         },
+        /* Landing neon palette */
+        neon: {
+          cyan: "#00F0FF",
+          purple: "#B026FF",
+          green: "#00FF94",
+        },
+        space: "#050505",
       },
       fontFamily: {
         sans: ["var(--font-inter)", "system-ui", "sans-serif"],
@@ -32,6 +39,7 @@ const config: Config = {
       animation: {
         "fade-in": "fadeIn 0.2s ease-in-out",
         "slide-up": "slideUp 0.3s ease-out",
+        "pulse-slow": "pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite",
       },
       keyframes: {
         fadeIn: {
@@ -42,6 +50,11 @@ const config: Config = {
           "0%": { opacity: "0", transform: "translateY(8px)" },
           "100%": { opacity: "1", transform: "translateY(0)" },
         },
+      },
+      backgroundImage: {
+        "radial-cyan": "radial-gradient(circle, rgba(0,240,255,0.15) 0%, transparent 70%)",
+        "radial-purple": "radial-gradient(circle, rgba(176,38,255,0.15) 0%, transparent 70%)",
+        "radial-green": "radial-gradient(circle, rgba(0,255,148,0.15) 0%, transparent 70%)",
       },
     },
   },

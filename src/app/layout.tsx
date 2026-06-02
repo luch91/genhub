@@ -3,6 +3,8 @@ import { Inter, JetBrains_Mono } from "next/font/google"
 import { Providers } from "./providers"
 import { Header } from "@/components/layout/header"
 import { Footer } from "@/components/layout/footer"
+import { LenisProvider } from "@/providers/lenis-provider"
+import { SoundToggle } from "@/components/landing/sound-toggle"
 import "./globals.css"
 
 const inter = Inter({
@@ -17,15 +19,15 @@ const jetbrainsMono = JetBrains_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: "GenLayer Builders Hub",
-    template: "%s | GenLayer Builders Hub",
+    default: "GenHub",
+    template: "%s | GenHub",
   },
   description:
-    "The home for GenLayer builders. Submit your Intelligent Contract projects, build in public, and connect with the community.",
+    "The quality-gated home for GenLayer builders. Submit Intelligent Contract projects, build in public, and connect with the community.",
   openGraph: {
-    title: "GenLayer Builders Hub",
+    title: "GenHub",
     description:
-      "The home for GenLayer builders. Submit your Intelligent Contract projects, build in public, and connect with the community.",
+      "The quality-gated home for GenLayer builders. Submit Intelligent Contract projects, build in public, and connect with the community.",
     type: "website",
   },
 }
@@ -39,9 +41,12 @@ export default function RootLayout({
     <html lang="en" className={`${inter.variable} ${jetbrainsMono.variable}`}>
       <body className="flex min-h-screen flex-col">
         <Providers>
-          <Header />
-          <main className="flex-1">{children}</main>
-          <Footer />
+          <LenisProvider>
+            <Header />
+            <main className="flex-1">{children}</main>
+            <Footer />
+            <SoundToggle />
+          </LenisProvider>
         </Providers>
       </body>
     </html>
