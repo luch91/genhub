@@ -13,7 +13,7 @@ const STEPS = [
     label:  "Join the Hub",
     title:  "Join the Hub",
     description:
-      "Create your builder profile. Connect your wallet. Tell us what you're building.",
+      "Sign in with GitHub or Google. Create your builder profile. Tell us what you're building.",
     nodeColors: [
       ["amber","amber-lt","amber"],
       ["amber-lt","amber","amber-lt"],

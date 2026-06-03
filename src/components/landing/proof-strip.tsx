@@ -3,21 +3,17 @@
 import { motion } from "framer-motion"
 
 const BUILDERS = [
-  { handle: "alice.eth",   name: "Alice Chen",      initials: "AC", color: "#4f46e5" },
-  { handle: "bob.xyz",     name: "Bob Nakamura",    initials: "BN", color: "#fbbf24" },
-  { handle: "carol.eth",   name: "Carol Santos",    initials: "CS", color: "#6366f1" },
-  { handle: "dave.lens",   name: "Dave Okafor",     initials: "DO", color: "#1a1a2e" },
-  { handle: "eve.eth",     name: "Eve Lindqvist",   initials: "EL", color: "#818cf8" },
-  { handle: "frank.xyz",   name: "Frank Muller",    initials: "FM", color: "#4f46e5" },
-  { handle: "grace.eth",   name: "Grace Park",      initials: "GP", color: "#f59e0b" },
-  { handle: "hiro.eth",    name: "Hiro Tanaka",     initials: "HT", color: "#a5b4fc" },
-  { handle: "iris.lens",   name: "Iris Ferreira",   initials: "IF", color: "#4f46e5" },
-  { handle: "jake.xyz",    name: "Jake Williams",   initials: "JW", color: "#fbbf24" },
-  { handle: "kira.eth",    name: "Kira Bogdanov",   initials: "KB", color: "#6366f1" },
-  { handle: "leo.eth",     name: "Leo Mwangi",      initials: "LM", color: "#1a1a2e" },
+  { name: "Pavel",       initials: "PV", color: "#4f46e5" },
+  { name: "emark",       initials: "EM", color: "#fbbf24" },
+  { name: "Mr Network",  initials: "MN", color: "#6366f1" },
+  { name: "JayDeculein", initials: "JD", color: "#1a1a2e" },
+  { name: "Dude",        initials: "DU", color: "#818cf8" },
+  { name: "Gen.Dave",    initials: "GD", color: "#f59e0b" },
+  { name: "Ying",        initials: "YI", color: "#4f46e5" },
+  { name: "gaymused",    initials: "GM", color: "#a5b4fc" },
 ]
 
-function BuilderChip({ handle, name, initials, color }: (typeof BUILDERS)[number]) {
+function BuilderChip({ name, initials, color }: (typeof BUILDERS)[number]) {
   return (
     <div className="flex flex-shrink-0 items-center gap-2.5 rounded-pill border border-brand-indigo/10 bg-white/70 px-4 py-2 backdrop-blur-sm">
       <span
@@ -27,13 +23,8 @@ function BuilderChip({ handle, name, initials, color }: (typeof BUILDERS)[number
       >
         {initials}
       </span>
-      <div>
-        <div className="font-ui text-xs font-semibold text-brand-navy leading-none">
-          {name}
-        </div>
-        <div className="font-mono text-[10px] text-brand-indigo/60 mt-0.5">
-          @{handle}
-        </div>
+      <div className="font-ui text-xs font-semibold text-brand-navy leading-none">
+        {name}
       </div>
     </div>
   )
@@ -52,8 +43,8 @@ export function ProofStrip() {
         transition={{ duration: 0.5 }}
       >
         <span className="font-mono text-xs font-bold uppercase tracking-[0.18em] text-brand-navy/40">
-          Trusted by{" "}
-          <span className="text-brand-indigo">500+</span> GenLayer builders
+          Built by the{" "}
+          <span className="text-brand-indigo">GenLayer</span> builder community
         </span>
       </motion.div>
 

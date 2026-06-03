@@ -6,7 +6,7 @@ export const metadata: Metadata = { title: "Sign in" }
 
 export default async function LoginPage() {
   const session = await auth()
-  if (session?.user) redirect("/")
+  if (session?.user) redirect("/projects")
 
   return (
     <div className="flex min-h-[calc(100vh-4rem)] items-center justify-center px-6 py-12">
@@ -27,14 +27,14 @@ export default async function LoginPage() {
         </div>
 
         <div className="card space-y-3">
-          <form action={async () => { "use server"; await signIn("github", { redirectTo: "/" }) }}>
+          <form action={async () => { "use server"; await signIn("github", { redirectTo: "/projects" }) }}>
             <button type="submit" className="btn-secondary w-full gap-2">
               <GitHubIcon />
               Continue with GitHub
             </button>
           </form>
 
-          <form action={async () => { "use server"; await signIn("google", { redirectTo: "/" }) }}>
+          <form action={async () => { "use server"; await signIn("google", { redirectTo: "/projects" }) }}>
             <button type="submit" className="btn-secondary w-full gap-2">
               <GoogleIcon />
               Continue with Google

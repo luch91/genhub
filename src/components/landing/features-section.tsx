@@ -20,13 +20,13 @@ const ICONS: { pattern: (TileColor | null)[][] }[] = [
 const FEATURES = [
   {
     title: "Submit Your Project",
-    body:  "Spend one submission credit to publish your Intelligent Contract project with a required on-chain angle — keeping the feed high-signal.",
+    body:  "Publish your Intelligent Contract project with a required on-chain angle — keeping the feed high-signal and GenLayer-specific.",
     size:  "large",
     iconIdx: 0,
   },
   {
     title: "Community Upvotes",
-    body:  "The community surfaces the best work. Hit 5 upvotes and earn your submission credit back. Quality gets rewarded.",
+    body:  "The community surfaces the best work. Upvote projects you believe in and help the best builders get ecosystem visibility.",
     size:  "large",
     iconIdx: 1,
   },
@@ -49,8 +49,8 @@ const FEATURES = [
     iconIdx: 4,
   },
   {
-    title: "Ecosystem Missions",
-    body:  "Complete weekly challenges set by the GenLayer Foundation. Earn reputation and foundation visibility.",
+    title: "Community Discussions",
+    body:  "Ask questions, share ideas, and get feedback from other builders — before you write a single line of code.",
     size:  "small",
     iconIdx: 5,
   },

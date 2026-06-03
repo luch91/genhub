@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback } from "react"
 import { motion } from "framer-motion"
 import Link from "next/link"
+import Image from "next/image"
 import { cn } from "@/lib/utils"
 
 const NAV_LINKS = [
@@ -12,7 +13,9 @@ const NAV_LINKS = [
   { label: "Pricing",      href: "#pricing"     },
 ]
 
-export function LandingNavbar() {
+type NavUser = { name?: string | null; image?: string | null; email?: string | null } | null
+
+export function LandingNavbar({ user }: { user?: NavUser }) {
   const [scrolled, setScrolled] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
 
@@ -77,18 +80,42 @@ export function LandingNavbar() {
 
           {/* CTA */}
           <div className="flex items-center gap-3">
-            <Link
-              href="/login"
-              className="hidden text-sm font-ui font-medium text-brand-navy/60 hover:text-brand-navy transition-colors md:block"
-            >
-              Sign in
-            </Link>
-            <Link
-              href="/login"
-              className="rounded-pill bg-brand-indigo px-5 py-2 font-ui text-sm font-medium text-white shadow-glow-indigo transition-all hover:bg-brand-indigo/90 hover:shadow-none"
-            >
-              Join the Community
-            </Link>
+            {user ? (
+              <>
+                <Link
+                  href="/projects"
+                  className="hidden text-sm font-ui font-medium text-brand-navy/60 hover:text-brand-navy transition-colors md:flex items-center gap-2"
+                >
+                  {user.image ? (
+                    <Image src={user.image} alt={user.name ?? ""} width={24} height={24} className="rounded-full" />
+                  ) : (
+                    <span className="h-6 w-6 rounded-full bg-brand-indigo/20 inline-block" />
+                  )}
+                  <span>{user.name ?? "Account"}</span>
+                </Link>
+                <Link
+                  href="/projects"
+                  className="rounded-pill bg-brand-indigo px-5 py-2 font-ui text-sm font-medium text-white shadow-glow-indigo transition-all hover:bg-brand-indigo/90 hover:shadow-none"
+                >
+                  Go to App
+                </Link>
+              </>
+            ) : (
+              <>
+                <Link
+                  href="/login"
+                  className="hidden text-sm font-ui font-medium text-brand-navy/60 hover:text-brand-navy transition-colors md:block"
+                >
+                  Sign in
+                </Link>
+                <Link
+                  href="/login"
+                  className="rounded-pill bg-brand-indigo px-5 py-2 font-ui text-sm font-medium text-white shadow-glow-indigo transition-all hover:bg-brand-indigo/90 hover:shadow-none"
+                >
+                  Join the Community
+                </Link>
+              </>
+            )}
 
             {/* Hamburger */}
             <button
@@ -121,6 +148,34 @@ export function LandingNavbar() {
                   {link.label}
                 </button>
               ))}
+              <div className="mt-2 border-t border-white/10 pt-2">
+                {user ? (
+                  <Link
+                    href="/projects"
+                    onClick={() => setMenuOpen(false)}
+                    className="block rounded-lg px-3 py-2 font-ui text-sm font-semibold text-brand-indigo"
+                  >
+                    Go to App
+                  </Link>
+                ) : (
+                  <>
+                    <Link
+                      href="/login"
+                      onClick={() => setMenuOpen(false)}
+                      className="block rounded-lg px-3 py-2 font-ui text-sm font-medium text-brand-navy/70"
+                    >
+                      Sign in
+                    </Link>
+                    <Link
+                      href="/login"
+                      onClick={() => setMenuOpen(false)}
+                      className="mt-1 block rounded-lg bg-brand-indigo px-3 py-2 text-center font-ui text-sm font-medium text-white"
+                    >
+                      Join the Community
+                    </Link>
+                  </>
+                )}
+              </div>
             </div>
           </motion.div>
         )}

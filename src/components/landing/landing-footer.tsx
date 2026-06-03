@@ -7,33 +7,22 @@ const NAV_COLS = [
       { label: "Features",    href: "#features"    },
       { label: "How It Works",href: "#how-it-works" },
       { label: "Pricing",     href: "#pricing"     },
-      { label: "Changelog",   href: "/changelog"   },
     ],
   },
   {
     heading: "Community",
     links: [
-      { label: "Submit a Project",  href: "/projects/submit" },
-      { label: "Browse Projects",   href: "/projects"        },
-      { label: "Builder Profiles",  href: "/builders"        },
-      { label: "Upvote Board",      href: "/projects?sort=upvotes" },
+      { label: "Submit a Project", href: "/projects/submit" },
+      { label: "Browse Projects",  href: "/projects"        },
+      { label: "Builder Profiles", href: "/builders"        },
+      { label: "Discussions",      href: "/discuss"         },
     ],
   },
   {
     heading: "Ecosystem",
     links: [
-      { label: "GenLayer Docs",  href: "https://docs.genlayer.com", external: true },
-      { label: "Shipyard",       href: "https://shipyard.genlayer.com", external: true },
-      { label: "GenScope",       href: "https://genscope.genlayer.com", external: true },
-      { label: "Foundation",     href: "https://genlayer.com", external: true },
-    ],
-  },
-  {
-    heading: "Legal",
-    links: [
-      { label: "Privacy Policy", href: "/privacy" },
-      { label: "Terms",          href: "/terms"   },
-      { label: "Cookie Policy",  href: "/cookies" },
+      { label: "GenLayer Docs", href: "https://docs.genlayer.com", external: true },
+      { label: "Foundation",    href: "https://genlayer.com",      external: true },
     ],
   },
 ]
@@ -119,7 +108,7 @@ export function LandingFooter() {
         </div>
 
         {/* Nav columns */}
-        <div className="grid grid-cols-2 gap-8 md:grid-cols-4">
+        <div className="grid grid-cols-2 gap-8 md:grid-cols-3">
           {NAV_COLS.map((col) => (
             <div key={col.heading}>
               <div className="mb-4 font-mono text-[10px] font-bold uppercase tracking-widest text-white/30">

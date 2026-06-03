@@ -94,8 +94,8 @@ export function CTABanner() {
 
           {/* Sub */}
           <p className="mx-auto mt-6 max-w-xl font-body text-lg text-brand-navy/60">
-            Join hundreds of GenLayer builders sharing work, getting feedback,
-            and shaping the ecosystem.
+            Join the GenLayer builder community — share your work, get feedback,
+            and shape the ecosystem.
           </p>
 
           {/* CTAs */}
