@@ -10,6 +10,7 @@ import { UpvoteButton } from "@/components/projects/upvote-button"
 import { VerifyButton } from "@/components/projects/verify-button"
 import { RemixButton } from "@/components/projects/remix-button"
 import { ResubmitButton } from "@/components/projects/resubmit-button"
+import { PostUpdateForm } from "@/components/projects/post-update-form"
 
 type PageProps = { params: Promise<{ slug: string }> }
 
@@ -74,6 +75,8 @@ export default async function ProjectPage({ params }: PageProps) {
   const session = await auth()
   const project = await getProject(slug, session?.user?.id)
   if (!project) notFound()
+
+  const isAuthor = session?.user?.id === project.authorId
 
   const approvals         = project.reviews.filter((r) => r.decision === "APPROVED").length
   const rejections        = project.reviews.filter((r) => r.decision === "REJECTED").length
@@ -190,10 +193,11 @@ export default async function ProjectPage({ params }: PageProps) {
           </div>
 
           {/* Build log */}
-          {project.updates.length > 0 && (
+          {(isAuthor || project.updates.length > 0) && (
             <div>
               <h2 className="section-heading mb-4">Build log</h2>
               <div className="space-y-3">
+                {isAuthor && <PostUpdateForm projectId={project.id} />}
                 {project.updates.map((update) => (
                   <div key={update.id} className="card">
                     <div className="mb-2 flex items-center gap-2">
