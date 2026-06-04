@@ -8,6 +8,10 @@ const _listeners = new Set<() => void>()
 
 export function setSoundMuted(muted: boolean) {
   _muted = muted
+  // Create and unlock the AudioContext now, while we're inside the trusted click
+  // gesture. Hover events are not trusted by browsers, so if we wait until the
+  // first play() call the context will be suspended and no sound will play.
+  if (!muted) getCtx()
   _listeners.forEach((fn) => fn())
 }
 

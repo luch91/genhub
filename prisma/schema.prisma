@@ -77,6 +77,10 @@ model User {
   following       Follow[]       @relation("Follower")
   followers       Follow[]       @relation("Following")
   notifications   Notification[]
+
+  hostedSessions    BuilderSession[]   @relation("BuilderSessionHost")
+  hostedSpaces      Space[]            @relation("SpaceHost")
+  spaceParticipants SpaceParticipant[]
 }
 
 enum ProjectStatus {
@@ -117,6 +121,8 @@ model Project {
   comments Comment[]
   upvotes  Upvote[]
   reviews  ProjectReview[]
+  sessions BuilderSession[]
+  spaces   Space[]
 }
 
 model Tag {
@@ -124,6 +130,8 @@ model Tag {
   name     String       @unique
   slug     String       @unique
   projects ProjectTag[]
+  sessions BuilderSession[]
+  spaces   Space[]
 }
 
 model ProjectTag {
@@ -278,4 +286,89 @@ model Reply {
 
   discussionId String
   discussion   Discussion @relation(fields: [discussionId], references: [id], onDelete: Cascade)
+}
+
+// ─── Builder Sessions (YouTube-embedded) ─────────────────────────────────────
+
+enum BuilderSessionStatus {
+  SCHEDULED
+  LIVE
+  ENDED
+}
+
+model BuilderSession {
+  id             String               @id @default(cuid())
+  title          String
+  description    String?              @db.Text
+  status         BuilderSessionStatus @default(SCHEDULED)
+  scheduledAt    DateTime?
+  startedAt      DateTime?
+  endedAt        DateTime?
+  youtubeUrl     String?
+  youtubeVideoId String?
+  isRecurring    Boolean              @default(false)
+  recurrence     String?
+  createdAt      DateTime             @default(now())
+  updatedAt      DateTime             @updatedAt
+
+  hostId  String
+  host    User     @relation("BuilderSessionHost", fields: [hostId], references: [id], onDelete: Cascade)
+
+  projectId String?
+  project   Project? @relation(fields: [projectId], references: [id], onDelete: SetNull)
+
+  tags Tag[]
+}
+
+// ─── Spaces (Live audio rooms via Livekit) ───────────────────────────────────
+
+enum SpaceStatus {
+  SCHEDULED
+  LIVE
+  ENDED
+}
+
+enum ParticipantRole {
+  HOST
+  SPEAKER
+  LISTENER
+}
+
+model Space {
+  id            String      @id @default(cuid())
+  title         String
+  description   String?     @db.Text
+  status        SpaceStatus @default(SCHEDULED)
+  scheduledAt   DateTime?
+  startedAt     DateTime?
+  endedAt       DateTime?
+  roomName      String      @unique
+  listenerCount Int         @default(0)
+  replayUrl     String?
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  hostId  String
+  host    User     @relation("SpaceHost", fields: [hostId], references: [id], onDelete: Cascade)
+
+  projectId String?
+  project   Project? @relation(fields: [projectId], references: [id], onDelete: SetNull)
+
+  participants SpaceParticipant[]
+  tags         Tag[]
+}
+
+model SpaceParticipant {
+  id         String          @id @default(cuid())
+  role       ParticipantRole @default(LISTENER)
+  handRaised Boolean         @default(false)
+  joinedAt   DateTime        @default(now())
+
+  spaceId String
+  space   Space  @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([spaceId, userId])
 }

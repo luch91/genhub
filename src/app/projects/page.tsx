@@ -50,9 +50,6 @@ export default async function ProjectsPage({ searchParams }: PageProps) {
             {projects.length} project{projects.length !== 1 ? "s" : ""} built on GenLayer
           </p>
         </div>
-        <Link href="/projects/submit" className="btn-primary self-start sm:self-auto">
-          Submit project
-        </Link>
       </div>
 
       {/* Tag filters */}

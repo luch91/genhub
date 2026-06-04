@@ -110,3 +110,30 @@ export const builderProfileSchema = z.object({
 })
 
 export type BuilderProfileInput = z.infer<typeof builderProfileSchema>
+
+export const createBuilderSessionSchema = z.object({
+  title:       z.string().min(5, "Title must be at least 5 characters").max(120),
+  description: z.string().max(500).optional(),
+  scheduledAt: z.string().datetime().optional(),
+  youtubeUrl:  z.string().url("Must be a valid YouTube URL").optional().or(z.literal("")),
+  projectId:   z.string().optional(),
+  isRecurring: z.boolean().default(false),
+  recurrence:  z.string().max(60).optional(),
+  tags:        z.array(z.string()).max(5).default([]),
+})
+
+export type CreateBuilderSessionInput = z.infer<typeof createBuilderSessionSchema>
+
+export const createSpaceSchema = z.object({
+  title:       z.string().min(5, "Title must be at least 5 characters").max(120),
+  description: z.string().max(500).optional(),
+  scheduledAt: z.string().datetime().optional(),
+  projectId:   z.string().optional(),
+  tags:        z.array(z.string()).max(5).default([]),
+})
+
+export type CreateSpaceInput = z.infer<typeof createSpaceSchema>
+
+export const endSpaceSchema = z.object({
+  replayUrl: z.string().url().optional().or(z.literal("")),
+})

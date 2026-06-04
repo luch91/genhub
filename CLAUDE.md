@@ -10,6 +10,8 @@ A full-stack Next.js web application where the GenLayer developer community gath
 - Discover and upvote other builders' work
 - Verify deployed contract addresses
 - Connect with other builders via profiles
+- Watch and schedule YouTube-embedded builder sessions
+- Join and host live audio rooms (Spaces) powered by Livekit
 
 ## Tech Stack
 
@@ -22,6 +24,7 @@ A full-stack Next.js web application where the GenLayer developer community gath
 | Database | PostgreSQL | Relational data with JSON support |
 | Auth | NextAuth v5 | OAuth providers + Prisma adapter |
 | Validation | Zod | Runtime validation + TypeScript inference |
+| Live audio | Livekit | WebRTC-based audio rooms for Spaces |
 | Deployment | Vercel | Native Next.js platform |
 
 ## Project Structure
@@ -29,28 +32,36 @@ A full-stack Next.js web application where the GenLayer developer community gath
 ```
 src/
 ├── app/
-│   ├── (auth)/             # Route group — login, register
+│   ├── (auth)/             # Route group — login
 │   ├── builders/           # Builder directory + profiles
 │   ├── feed/               # Build-in-public feed
 │   ├── projects/           # Gallery, submit, individual project
+│   ├── sessions/           # Builder sessions (YouTube embeds)
+│   │   └── schedule/       # Schedule a session form
+│   ├── spaces/             # Live audio rooms (Livekit)
+│   │   ├── create/         # Create a space form
+│   │   └── [id]/           # Live space room page
 │   ├── api/                # API route handlers
-│   ├── actions/            # Server actions
-│   ├── layout.tsx          # Root layout
+│   │   ├── sessions/       # GET/POST sessions, PATCH/DELETE [id]
+│   │   └── spaces/         # GET/POST spaces, token/end/raise-hand/admit
+│   ├── layout.tsx
 │   ├── page.tsx            # Landing page
-│   ├── globals.css         # Tailwind + CSS variables
-│   └── providers.tsx       # Client providers (SessionProvider)
+│   ├── globals.css
+│   └── providers.tsx
 ├── components/
 │   ├── layout/             # Header, footer
-│   ├── projects/           # ProjectCard, ProjectGallery, SubmitForm
-│   ├── builders/           # BuilderCard
-│   └── feed/               # FeedItem, FeedList
+│   ├── projects/           # ProjectCard, SubmitForm, etc.
+│   ├── sessions/           # SessionCard, YoutubeEmbed, ScheduleForm
+│   ├── spaces/             # SpaceCard, SpaceRoom, CreateForm
+│   ├── builders/
+│   └── feed/
 ├── lib/
-│   ├── auth.ts             # NextAuth config + exports
+│   ├── auth.ts
 │   ├── db.ts               # Prisma client singleton
-│   ├── utils.ts            # cn(), slugify(), formatRelativeDate()
+│   ├── utils.ts            # cn(), slugify(), extractYouTubeId(), generateRoomName()
 │   └── validations.ts      # Zod schemas for all forms/APIs
 └── types/
-    └── index.ts            # Shared TypeScript types
+    └── index.ts
 prisma/
 └── schema.prisma           # Full database schema
 ```
@@ -95,7 +106,10 @@ Copy `.env.example` to `.env.local` for local development.
 | `AUTH_GITHUB_SECRET` | GitHub OAuth app client secret |
 | `AUTH_GOOGLE_ID` | Google OAuth client ID |
 | `AUTH_GOOGLE_SECRET` | Google OAuth client secret |
-| `NEXT_PUBLIC_APP_URL` | Public app URL (e.g. `https://builders.genlayer.com`) |
+| `NEXT_PUBLIC_APP_URL` | Public app URL (e.g. `https://community.genhub.fun`) |
+| `LIVEKIT_API_KEY` | Livekit API key — from cloud.livekit.io |
+| `LIVEKIT_API_SECRET` | Livekit API secret |
+| `NEXT_PUBLIC_LIVEKIT_URL` | Livekit WSS URL (e.g. `wss://your-app.livekit.cloud`) |
 
 ## Key Patterns
 
@@ -137,16 +151,19 @@ Project slugs are derived from the title via `slugify()` in `@/lib/utils`. Uniqu
 
 ## Feature Status
 
-The scaffold is in place. These features are stubbed with UI shells and need full API wiring:
-
-- [x] Project submission form (UI done)
-- [x] Project gallery with tag filtering (UI done)
-- [x] Builder profiles (UI done)
-- [x] Build-in-public feed (UI done)
-- [ ] Upvoting (API + optimistic UI)
-- [ ] Comment threads
-- [ ] On-chain contract address verification
-- [ ] Builder onboarding (username selection post-OAuth)
+- [x] Project submission, gallery, tag filtering
+- [x] Builder profiles, follow system
+- [x] Build-in-public feed
+- [x] Upvoting with 2-week expiry cron
+- [x] Comment threads
+- [x] On-chain contract address verification
+- [x] Builder onboarding (username selection post-OAuth)
+- [x] "Remix This" project fork flow
+- [x] Email notifications (Resend)
+- [x] Discussion board
+- [x] In-app notifications with bell icon
+- [x] Sessions — YouTube-embedded builder sessions (`/sessions`)
+- [x] Spaces — Live audio rooms via Livekit (`/spaces`)
+- [ ] Sessions / Spaces tag picker (tags field omitted from create forms for now)
+- [ ] Sessions edit form (PATCH /api/sessions/[id] exists, no UI yet)
 - [ ] Weekly community challenges / bounties
-- [ ] "Remix This" project fork flow
-- [ ] Email notifications

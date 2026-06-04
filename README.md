@@ -101,6 +101,21 @@ Projects go live instantly on submission and are community-curated through upvot
 - Remix retains a visible attribution banner linking back to the source project
 - The original `remixedFromId` is stored on the forked project
 
+### Builder Sessions
+- Schedule YouTube-embedded live or recorded sessions at `/sessions`
+- Sessions embed directly on GenHub — viewers never leave the site
+- Supports one-off and recurring sessions with optional recurrence description
+- Paste any YouTube URL format (watch, youtu.be, /live/) — the video ID is extracted automatically
+- Sessions have three states: **Scheduled** (shows date), **Live** (embed appears), **Ended** (replay embed)
+
+### Spaces (Live Audio)
+- Host live audio rooms at `/spaces` powered by [Livekit](https://livekit.io)
+- Any signed-in builder can start a space and become the host
+- Listeners can raise their hand; the host can admit them as speakers
+- Hosts can end the space and optionally save a YouTube replay URL
+- 6-hour token TTL prevents silent mid-session disconnects
+- Automatic WebSocket reconnection on mobile screen lock / network drop
+
 ---
 
 ## Tech Stack
@@ -117,6 +132,7 @@ Projects go live instantly on submission and are community-curated through upvot
 | Validation | Zod | ^3.23.8 |
 | File Storage | Vercel Blob | ^2.4.0 |
 | Email | Resend (raw fetch) | — |
+| Live Audio | Livekit | livekit-server-sdk ^2.15, livekit-client ^2.19 |
 | Animation | Framer Motion | ^11 |
 | Runtime | Node.js | 24 LTS |
 | Deployment | Vercel | — |
@@ -147,6 +163,14 @@ genhub/
 │   │   │   │       ├── review/
 │   │   │   │       ├── upvote/
 │   │   │   │       └── verify/
+│   │   │   ├── sessions/              # Builder sessions API
+│   │   │   │   └── [id]/
+│   │   │   ├── spaces/                # Livekit spaces API
+│   │   │   │   └── [id]/
+│   │   │   │       ├── admit/
+│   │   │   │       ├── end/
+│   │   │   │       ├── raise-hand/
+│   │   │   │       └── token/
 │   │   │   └── user/
 │   │   │       └── avatar/  # Vercel Blob avatar upload
 │   │   ├── builders/
@@ -160,7 +184,12 @@ genhub/
 │   │   │   ├── page.tsx          # Project gallery
 │   │   │   ├── submit/
 │   │   │   ├── remix/[slug]/     # Fork a project
-│   │   │   └── [slug]/           # Project detail
+│   │   │   └── [slug]/           # Project detail + edit
+│   │   ├── sessions/             # Sessions listing + schedule form
+│   │   │   └── schedule/
+│   │   ├── spaces/               # Spaces listing + create form + live room
+│   │   │   ├── create/
+│   │   │   └── [id]/
 │   │   ├── review/               # Review queue (retained, hidden from nav)
 │   │   ├── settings/             # Profile editing
 │   │   ├── globals.css
@@ -176,19 +205,27 @@ genhub/
 │   │   ├── landing/
 │   │   ├── layout/
 │   │   ├── notifications/
-│   │   └── projects/
-│   │       ├── project-card.tsx
-│   │       ├── remix-button.tsx
-│   │       ├── resubmit-button.tsx
-│   │       ├── submit-form.tsx
-│   │       ├── upvote-button.tsx
-│   │       └── verify-button.tsx
+│   │   ├── projects/
+│   │   │   ├── project-card.tsx
+│   │   │   ├── remix-button.tsx
+│   │   │   ├── resubmit-button.tsx
+│   │   │   ├── submit-form.tsx
+│   │   │   ├── upvote-button.tsx
+│   │   │   └── verify-button.tsx
+│   │   ├── sessions/
+│   │   │   ├── session-card.tsx
+│   │   │   ├── schedule-form.tsx
+│   │   │   └── youtube-embed.tsx
+│   │   └── spaces/
+│   │       ├── space-card.tsx
+│   │       ├── create-form.tsx
+│   │       └── space-room.tsx
 │   ├── lib/
 │   │   ├── auth.ts           # NextAuth config (GitHub + Google)
 │   │   ├── db.ts             # Prisma singleton
 │   │   ├── email.ts          # Resend raw fetch helper
 │   │   ├── notifications.ts  # notifyUser() + notifyFollowers()
-│   │   ├── utils.ts          # cn(), slugify(), constants
+│   │   ├── utils.ts          # cn(), slugify(), extractYouTubeId(), generateRoomName()
 │   │   └── validations.ts    # Zod schemas
 │   └── types/
 │       └── next-auth.d.ts    # Session type augmentation
@@ -272,6 +309,9 @@ Open [http://localhost:3000](http://localhost:3000).
 | `RESEND_API_KEY` | Optional | Resend API key — emails are silently skipped if absent |
 | `EMAIL_FROM` | Optional | Sender address (default: `GenHub <noreply@genhub.fun>`) |
 | `GENLAYER_RPC_URL` | Optional | GenLayer JSON-RPC URL (default: `https://studio.genlayer.com:8443/api`) |
+| `LIVEKIT_API_KEY` | Yes (Spaces) | Livekit API key — from [cloud.livekit.io](https://cloud.livekit.io) |
+| `LIVEKIT_API_SECRET` | Yes (Spaces) | Livekit API secret |
+| `NEXT_PUBLIC_LIVEKIT_URL` | Yes (Spaces) | Livekit WSS URL (e.g. `wss://your-app.livekit.cloud`) |
 
 ### OAuth callback URLs
 
@@ -310,6 +350,9 @@ GenHub uses **PostgreSQL 16**. [Neon](https://neon.tech) is recommended.
 | `Reply` | Reply to a discussion |
 | `Follow` | Builder-to-builder follow |
 | `Notification` | In-app notification |
+| `BuilderSession` | YouTube-embedded session (Scheduled / Live / Ended) |
+| `Space` | Livekit audio room (Scheduled / Live / Ended) |
+| `SpaceParticipant` | User in a Space with role (Host / Speaker / Listener) |
 
 ### Project status flow
 
@@ -585,6 +628,26 @@ All routes return JSON. Errors always return `{ "error": "message" }` with the a
 | `GET` | `/api/notifications` | Yes | Get notifications (`page`) |
 | `POST` | `/api/notifications` | Yes | Mark all as read |
 | `POST` | `/api/notifications/[id]/read` | Yes | Mark one as read |
+
+### Sessions
+
+| Method | Path | Auth | Description |
+|--------|------|------|-------------|
+| `GET` | `/api/sessions` | No | List all sessions |
+| `POST` | `/api/sessions` | Yes | Schedule a session |
+| `PATCH` | `/api/sessions/[id]` | Host | Update session fields |
+| `DELETE` | `/api/sessions/[id]` | Host | Delete a session |
+
+### Spaces
+
+| Method | Path | Auth | Description |
+|--------|------|------|-------------|
+| `GET` | `/api/spaces` | No | List all spaces |
+| `POST` | `/api/spaces` | Yes | Create a space + Livekit room |
+| `POST` | `/api/spaces/[id]/token` | Yes | Get Livekit join token (upserts participant) |
+| `POST` | `/api/spaces/[id]/end` | Host | End space + delete Livekit room |
+| `POST` | `/api/spaces/[id]/raise-hand` | Participant | Toggle hand raised |
+| `POST` | `/api/spaces/[id]/admit` | Host | Promote listener to speaker |
 
 ### Cron
 

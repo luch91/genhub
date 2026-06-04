@@ -26,10 +26,12 @@ export async function Header() {
 
         {/* Nav */}
         <nav className="flex items-center gap-1">
-          <Link href="/projects" className="btn-ghost py-1.5 text-sm">Projects</Link>
-          <Link href="/builders" className="btn-ghost py-1.5 text-sm">Builders</Link>
-          <Link href="/feed"     className="btn-ghost py-1.5 text-sm">Feed</Link>
-          <Link href="/discuss"  className="btn-ghost py-1.5 text-sm">Discuss</Link>
+          <Link href="/projects"  className="btn-ghost py-1.5 text-sm">Projects</Link>
+          <Link href="/builders"  className="btn-ghost py-1.5 text-sm">Builders</Link>
+          <Link href="/feed"      className="btn-ghost py-1.5 text-sm">Feed</Link>
+          <Link href="/discuss"   className="btn-ghost py-1.5 text-sm">Discuss</Link>
+          <Link href="/sessions"  className="btn-ghost py-1.5 text-sm">Sessions</Link>
+          <Link href="/spaces"    className="btn-ghost py-1.5 text-sm">Spaces</Link>
           {eligible && (
             <Link href="/review" className="btn-ghost py-1.5 text-sm font-medium text-brand-amber-dk hover:text-brand-amber-dk">
               Review
@@ -42,7 +44,7 @@ export async function Header() {
           {session?.user ? (
             <>
               <Link href="/projects/submit" className="btn-primary hidden py-1.5 text-sm sm:inline-flex">
-                Submit
+                Submit project
               </Link>
               <NotificationBell initialCount={unreadCount} />
               <UserMenu user={session.user} />

@@ -85,6 +85,25 @@ export const REVIEW_THRESHOLDS = {
   MIN_REPUTATION_TO_REVIEW: 50,
 } as const
 
+export function extractYouTubeId(url: string): string | null {
+  if (!url) return null
+  const patterns = [
+    /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/|youtube\.com\/live\/)([a-zA-Z0-9_-]{11})/,
+    /youtube\.com\/watch\?.*v=([a-zA-Z0-9_-]{11})/,
+  ]
+  for (const pattern of patterns) {
+    const match = url.match(pattern)
+    if (match) return match[1]
+  }
+  return null
+}
+
+export function generateRoomName(title: string): string {
+  const slug = title.toLowerCase().replace(/[^a-z0-9]+/g, "-").slice(0, 40)
+  const suffix = Math.random().toString(36).slice(2, 7)
+  return `${slug}-${suffix}`
+}
+
 export const UPDATE_TYPE_COLORS = {
   GENERAL: "bg-gray-100 text-gray-600",
   MILESTONE: "bg-violet-100 text-violet-700",
