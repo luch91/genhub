@@ -84,6 +84,11 @@ export const replySchema = z.object({
 export type ReplyInput = z.infer<typeof replySchema>
 
 export const builderProfileSchema = z.object({
+  name: z
+    .string()
+    .max(100, "Name must be 100 characters or less")
+    .optional()
+    .or(z.literal("")),
   username: z
     .string()
     .min(3, "Username must be at least 3 characters")

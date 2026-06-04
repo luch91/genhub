@@ -26,6 +26,7 @@ export async function PATCH(request: NextRequest) {
   const user = await db.user.update({
     where: { id: session.user.id },
     data: {
+      ...(result.data.name !== undefined && { name: result.data.name || null }),
       ...(result.data.username !== undefined && { username: result.data.username }),
       ...(result.data.bio !== undefined && { bio: result.data.bio || null }),
       ...(result.data.twitterHandle !== undefined && { twitterHandle: result.data.twitterHandle || null }),

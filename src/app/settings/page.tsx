@@ -14,6 +14,8 @@ export default async function SettingsPage() {
   const user = await db.user.findUnique({
     where: { id: session.user.id },
     select: {
+      name: true,
+      image: true,
       username: true,
       bio: true,
       twitterHandle: true,

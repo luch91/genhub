@@ -1,9 +1,11 @@
 "use client"
 
-import { useState } from "react"
+import { useRef, useState } from "react"
 import { useRouter } from "next/navigation"
 
 type DefaultValues = {
+  name: string | null
+  image: string | null
   username: string | null
   bio: string | null
   twitterHandle: string | null
@@ -16,22 +18,47 @@ type Props = { defaultValues: DefaultValues }
 
 export function ProfileForm({ defaultValues }: Props) {
   const router = useRouter()
+  const fileInputRef = useRef<HTMLInputElement>(null)
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null)
+  const [avatarFile, setAvatarFile] = useState<File | null>(null)
   const [error, setError] = useState("")
   const [loading, setLoading] = useState(false)
+
+  function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    setAvatarFile(file)
+    setPreviewUrl(URL.createObjectURL(file))
+  }
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
     setError("")
     setLoading(true)
 
+    // Capture form ref before any awaits — synthetic event is nullified after async gaps
     const form = e.currentTarget
+
+    if (avatarFile) {
+      const fd = new FormData()
+      fd.append("file", avatarFile)
+      const avatarRes = await fetch("/api/user/avatar", { method: "POST", body: fd })
+      if (!avatarRes.ok) {
+        const json = await avatarRes.json()
+        setError(json.error ?? "Failed to upload photo")
+        setLoading(false)
+        return
+      }
+    }
+
     const body = {
-      username:     (form.elements.namedItem("username")     as HTMLInputElement).value.trim(),
-      bio:          (form.elements.namedItem("bio")          as HTMLTextAreaElement).value.trim() || null,
-      twitterHandle:(form.elements.namedItem("twitterHandle")as HTMLInputElement).value.trim() || null,
-      githubHandle: (form.elements.namedItem("githubHandle") as HTMLInputElement).value.trim() || null,
-      website:      (form.elements.namedItem("website")      as HTMLInputElement).value.trim() || null,
-      walletAddress:(form.elements.namedItem("walletAddress")as HTMLInputElement).value.trim() || null,
+      name:          (form.elements.namedItem("name")          as HTMLInputElement).value.trim() || null,
+      username:      (form.elements.namedItem("username")      as HTMLInputElement).value.trim(),
+      bio:           (form.elements.namedItem("bio")           as HTMLTextAreaElement).value.trim() || null,
+      twitterHandle: (form.elements.namedItem("twitterHandle") as HTMLInputElement).value.trim() || null,
+      githubHandle:  (form.elements.namedItem("githubHandle")  as HTMLInputElement).value.trim() || null,
+      website:       (form.elements.namedItem("website")       as HTMLInputElement).value.trim() || null,
+      walletAddress: (form.elements.namedItem("walletAddress") as HTMLInputElement).value.trim() || null,
     }
 
     const res = await fetch("/api/user", {
@@ -51,6 +78,8 @@ export function ProfileForm({ defaultValues }: Props) {
     router.refresh()
   }
 
+  const avatarSrc = previewUrl ?? defaultValues.image
+
   return (
     <form onSubmit={handleSubmit} className="card space-y-5">
       {error && (
@@ -58,6 +87,52 @@ export function ProfileForm({ defaultValues }: Props) {
           {error}
         </div>
       )}
+
+      {/* Avatar */}
+      <div className="flex items-center gap-4">
+        <button
+          type="button"
+          onClick={() => fileInputRef.current?.click()}
+          className="group relative h-16 w-16 flex-shrink-0 overflow-hidden rounded-full focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-indigo"
+          aria-label="Change profile photo"
+        >
+          {avatarSrc ? (
+            <img src={avatarSrc} alt="Profile" className="h-full w-full object-cover" />
+          ) : (
+            <div className="h-full w-full bg-brand-indigo/15" />
+          )}
+          <div className="absolute inset-0 flex items-center justify-center rounded-full bg-brand-navy/50 opacity-0 transition-opacity group-hover:opacity-100">
+            <span className="font-ui text-xs font-semibold text-white">Edit</span>
+          </div>
+        </button>
+        <div>
+          <button
+            type="button"
+            onClick={() => fileInputRef.current?.click()}
+            className="text-sm font-medium text-brand-indigo transition-colors hover:text-brand-indigo/80"
+          >
+            Change photo
+          </button>
+          <p className="mt-0.5 text-xs text-brand-navy/40">JPG, PNG, WebP or GIF · Max 2 MB</p>
+        </div>
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/jpeg,image/png,image/webp,image/gif"
+          className="hidden"
+          onChange={handleFileChange}
+        />
+      </div>
+
+      <Field label="Display name">
+        <input
+          name="name"
+          className="input"
+          defaultValue={defaultValues.name ?? ""}
+          maxLength={100}
+          placeholder="Your name"
+        />
+      </Field>
 
       <Field label="Username">
         <input
@@ -134,7 +209,7 @@ export function ProfileForm({ defaultValues }: Props) {
         <button
           type="button"
           onClick={() => router.back()}
-          className="text-sm text-brand-navy/45 hover:text-brand-navy transition-colors"
+          className="text-sm text-brand-navy/45 transition-colors hover:text-brand-navy"
         >
           Cancel
         </button>
