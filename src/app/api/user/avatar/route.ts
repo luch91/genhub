@@ -25,15 +25,21 @@ export async function POST(request: NextRequest) {
     return Response.json({ error: "File must be under 2 MB" }, { status: 422 })
   }
 
-  const blob = await put(`avatars/${session.user.id}`, file, {
-    access: "public",
-    addRandomSuffix: false,
-  })
+  try {
+    const blob = await put(`avatars/${session.user.id}`, file, {
+      access: "public",
+      addRandomSuffix: false,
+    })
 
-  await db.user.update({
-    where: { id: session.user.id },
-    data: { image: blob.url },
-  })
+    await db.user.update({
+      where: { id: session.user.id },
+      data: { image: blob.url },
+    })
 
-  return Response.json({ url: blob.url })
+    return Response.json({ url: blob.url })
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "Upload failed"
+    console.error("[avatar upload]", message)
+    return Response.json({ error: message }, { status: 500 })
+  }
 }

@@ -45,8 +45,9 @@ export function ProfileForm({ defaultValues }: Props) {
         fd.append("file", avatarFile)
         const avatarRes = await fetch("/api/user/avatar", { method: "POST", body: fd })
         if (!avatarRes.ok) {
-          const json = await avatarRes.json()
-          setError(json.error ?? "Failed to upload photo")
+          let msg = "Failed to upload photo"
+          try { const j = await avatarRes.json(); msg = j.error ?? msg } catch { /* non-JSON error body */ }
+          setError(msg)
           setLoading(false)
           return
         }
@@ -68,17 +69,20 @@ export function ProfileForm({ defaultValues }: Props) {
         body: JSON.stringify(body),
       })
 
-      const json = await res.json()
       if (!res.ok) {
-        setError(typeof json.error === "string" ? json.error : "Please check the form and try again.")
+        let msg = "Please check the form and try again."
+        try { const j = await res.json(); msg = typeof j.error === "string" ? j.error : msg } catch { /* non-JSON */ }
+        setError(msg)
         setLoading(false)
         return
       }
 
+      const json = await res.json()
       router.refresh()
       router.push(`/builders/${json.username}`)
-    } catch {
-      setError("Something went wrong. Please try again.")
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "Something went wrong. Please try again."
+      setError(msg)
       setLoading(false)
     }
   }
