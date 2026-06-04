@@ -73,6 +73,7 @@ export async function POST(request: NextRequest) {
 
   const { tags, contractAddress, repoUrl, demoUrl, ...rest } = result.data
   const remixedFromId = (body.remixedFromId as string | undefined) ?? null
+  const coverImage   = (body.coverImage   as string | undefined) ?? null
 
   const baseSlug = slugify(rest.title)
   let slug = baseSlug
@@ -86,6 +87,7 @@ export async function POST(request: NextRequest) {
       contractAddress: contractAddress || null,
       repoUrl: repoUrl || null,
       demoUrl: demoUrl || null,
+      coverImage,
       remixedFromId,
       status: "PUBLISHED",
       publishedAt: new Date(),

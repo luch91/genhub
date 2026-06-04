@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useRef, useState } from "react"
 import { useRouter } from "next/navigation"
 import { projectSubmitSchema, type ProjectSubmitInput } from "@/lib/validations"
 import { PREDEFINED_TAGS } from "@/lib/utils"
@@ -15,6 +15,9 @@ type Props = {
 
 export function RemixForm({ remixedFromId, defaultTitle, defaultTags }: Props) {
   const router = useRouter()
+  const fileInputRef = useRef<HTMLInputElement>(null)
+  const [coverFile, setCoverFile] = useState<File | null>(null)
+  const [coverPreview, setCoverPreview] = useState<string | null>(null)
   const [errors, setErrors] = useState<FieldErrors>({})
   const [loading, setLoading] = useState(false)
   const [selectedTags, setSelectedTags] = useState<string[]>(
@@ -25,6 +28,13 @@ export function RemixForm({ remixedFromId, defaultTitle, defaultTags }: Props) {
     setSelectedTags((prev) =>
       prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag]
     )
+  }
+
+  function handleCoverChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    setCoverFile(file)
+    setCoverPreview(URL.createObjectURL(file))
   }
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -55,10 +65,25 @@ export function RemixForm({ remixedFromId, defaultTitle, defaultTags }: Props) {
       return
     }
 
+    let coverImage: string | null = null
+    if (coverFile) {
+      const fd = new FormData()
+      fd.append("file", coverFile)
+      const coverRes = await fetch("/api/projects/cover", { method: "POST", body: fd })
+      if (!coverRes.ok) {
+        const json = await coverRes.json()
+        setErrors({ root: json.error ?? "Failed to upload cover image" })
+        setLoading(false)
+        return
+      }
+      const { url } = await coverRes.json()
+      coverImage = url
+    }
+
     const res = await fetch("/api/projects", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ ...result.data, remixedFromId }),
+      body: JSON.stringify({ ...result.data, remixedFromId, coverImage }),
     })
 
     if (!res.ok) {
@@ -120,8 +145,44 @@ export function RemixForm({ remixedFromId, defaultTitle, defaultTags }: Props) {
       </Field>
 
       <div className="border-t border-brand-indigo/10 pt-6">
-        <h3 className="mb-4 text-sm font-medium text-brand-navy/45">Optional links</h3>
+        <h3 className="mb-4 text-sm font-medium text-brand-navy/45">Optional</h3>
         <div className="space-y-4">
+          {/* Cover image */}
+          <div className="space-y-1.5">
+            <label className="label">Cover image</label>
+            <p className="text-xs text-brand-navy/40">Shown on your project page and in link previews. JPG, PNG, WebP or GIF · Max 5 MB</p>
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              className="group relative flex w-full items-center justify-center overflow-hidden rounded-xl border border-dashed border-brand-indigo/20 bg-brand-indigo/3 transition-colors hover:border-brand-indigo/40"
+              style={{ height: coverPreview ? "auto" : "120px" }}
+            >
+              {coverPreview ? (
+                <img src={coverPreview} alt="Cover preview" className="w-full rounded-xl object-cover" />
+              ) : (
+                <span className="font-ui text-sm text-brand-navy/40 group-hover:text-brand-indigo transition-colors">
+                  Click to upload cover image
+                </span>
+              )}
+            </button>
+            {coverPreview && (
+              <button
+                type="button"
+                onClick={() => { setCoverFile(null); setCoverPreview(null) }}
+                className="text-xs text-brand-navy/40 hover:text-red-500 transition-colors"
+              >
+                Remove image
+              </button>
+            )}
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/jpeg,image/png,image/webp,image/gif"
+              className="hidden"
+              onChange={handleCoverChange}
+            />
+          </div>
+
           <Field label="Contract address" error={errors.contractAddress}>
             <input name="contractAddress" className="input font-mono" placeholder="0x..." />
           </Field>

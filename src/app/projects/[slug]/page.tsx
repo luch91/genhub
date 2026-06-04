@@ -49,7 +49,24 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const session = await auth()
   const project = await getProject(slug, session?.user?.id)
   if (!project) return {}
-  return { title: project.title, description: project.tagline }
+  return {
+    title: project.title,
+    description: project.tagline,
+    openGraph: {
+      title: project.title,
+      description: project.tagline,
+      type: "website",
+      ...(project.coverImage && {
+        images: [{ url: project.coverImage, width: 1200, height: 630, alt: project.title }],
+      }),
+    },
+    twitter: {
+      card: project.coverImage ? "summary_large_image" : "summary",
+      title: project.title,
+      description: project.tagline,
+      ...(project.coverImage && { images: [project.coverImage] }),
+    },
+  }
 }
 
 export default async function ProjectPage({ params }: PageProps) {
