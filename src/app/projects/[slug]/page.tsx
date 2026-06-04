@@ -152,7 +152,17 @@ export default async function ProjectPage({ params }: PageProps) {
                 </Link>
               ))}
             </div>
-            <h1 className="font-display text-3xl font-black text-brand-navy">{project.title}</h1>
+            <div className="flex items-start justify-between gap-4">
+              <h1 className="font-display text-3xl font-black text-brand-navy">{project.title}</h1>
+              {session?.user?.id === project.authorId && (
+                <Link
+                  href={`/projects/${project.slug}/edit`}
+                  className="shrink-0 rounded-lg border border-brand-indigo/20 px-3 py-1.5 font-ui text-xs font-medium text-brand-navy/55 transition-colors hover:border-brand-indigo/40 hover:text-brand-navy"
+                >
+                  Edit
+                </Link>
+              )}
+            </div>
             <p className="mt-2 text-lg text-brand-navy/55">{project.tagline}</p>
           </div>
 
@@ -226,30 +236,20 @@ export default async function ProjectPage({ params }: PageProps) {
           </div>
 
           {/* Actions */}
-          <div className="space-y-2">
-            {session?.user?.id === project.authorId && (
-              <Link
-                href={`/projects/${project.slug}/edit`}
-                className="flex w-full items-center justify-center rounded-xl border border-brand-indigo/20 px-4 py-2 font-ui text-sm font-medium text-brand-navy/65 transition-colors hover:border-brand-indigo/40 hover:text-brand-navy"
-              >
-                Edit project
-              </Link>
-            )}
-            {project.status === "PUBLISHED" && (
-              <>
-                <RemixButton
-                  slug={project.slug}
-                  currentUserId={session?.user?.id}
-                  authorId={project.authorId}
-                />
-                {session?.user?.id === project.authorId &&
-                  project.contractAddress &&
-                  !project.verified && (
-                    <VerifyButton projectId={project.id} />
-                  )}
-              </>
-            )}
-          </div>
+          {project.status === "PUBLISHED" && (
+            <div className="space-y-2">
+              <RemixButton
+                slug={project.slug}
+                currentUserId={session?.user?.id}
+                authorId={project.authorId}
+              />
+              {session?.user?.id === project.authorId &&
+                project.contractAddress &&
+                !project.verified && (
+                  <VerifyButton projectId={project.id} />
+                )}
+            </div>
+          )}
 
           {/* Author */}
           <div className="card">
