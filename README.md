@@ -1,6 +1,8 @@
 # GenHub
 
-The community platform for GenLayer builders. Submit Intelligent Contract projects, build in public, discover what others are creating, and connect with fellow developers in the GenLayer ecosystem.
+The open-access community platform for GenLayer builders. Submit Intelligent Contract projects, build in public, discover what others are creating, and connect with fellow developers in the GenLayer ecosystem.
+
+**Live:** [community.genhub.fun](https://community.genhub.fun)
 
 ---
 
@@ -16,101 +18,88 @@ The community platform for GenLayer builders. Submit Intelligent Contract projec
 - [Development Scripts](#development-scripts)
 - [Architecture](#architecture)
 - [Domain Model](#domain-model)
-- [Review System](#review-system)
+- [Community Curation](#community-curation)
 - [Submission Credits](#submission-credits)
-- [Reputation System](#reputation-system)
 - [Follow System](#follow-system)
 - [Notifications](#notifications)
+- [Email Notifications](#email-notifications)
+- [On-chain Contract Verification](#on-chain-contract-verification)
+- [Remix Flow](#remix-flow)
+- [Profile Management](#profile-management)
+- [Cron Jobs](#cron-jobs)
 - [API Reference](#api-reference)
-- [Roadmap](#roadmap)
 
 ---
 
 ## Overview
 
-GenHub is a full-stack web application built with Next.js 15 (App Router). It serves as the central gathering place for the GenLayer developer community — a quality-gated platform where builders submit projects, share build logs, discuss ideas, and follow each other's progress.
+GenHub is a full-stack web application built with Next.js 15 App Router. It is the central gathering place for the GenLayer developer community — an open-access platform where builders submit projects, share build logs, discuss ideas, and follow each other's progress.
 
-Every project submission goes through a community review process before it goes live. This keeps the platform high-signal and ensures only genuine GenLayer projects reach the gallery.
+Projects go live instantly on submission and are community-curated through upvotes. A project must earn 5 upvotes within 2 weeks to remain in the gallery. If it doesn't, the author is notified and can resubmit.
 
 ---
 
 ## Features
 
 ### Project Gallery
-- Builders submit Intelligent Contract projects with a title, tagline, full description, and a required **"Why only GenLayer?"** field that explains what makes the project only possible on GenLayer
-- Projects can include a contract address, repository URL, and demo URL
+- Submit Intelligent Contract projects with title, tagline, full description, and a required **"Why only GenLayer?"** field
+- Optional contract address, repository URL, and demo URL
 - Tag-based filtering (DeFi, AI Oracle, Gaming, Social, Tooling, Infrastructure, NFT, DAO, Identity, Data)
 - Sort by newest, most upvoted, or most active
-- Contract addresses can be marked as verified
+- Contract addresses can be verified on-chain via GenLayer's JSON-RPC
 
-### Community Review Gate
-- All submitted projects land in `PENDING_REVIEW` — they are not immediately public
-- Builders with at least one published project are eligible to review others
-- **3 approvals** → project is automatically published
-- **3 rejections** → project is sent back to `DRAFT` with reviewer feedback
-- Reviewers can optionally leave feedback on approvals; feedback is required on rejections
-- Author sees a live approval/rejection progress bar on their project page while it is under review
-- Rejected projects show all reviewer feedback to the author so they know exactly what to fix
+### Community Curation
+- Projects publish instantly on submission — no review gate
+- A project must earn **5 upvotes within 2 weeks** to stay in the gallery
+- Projects that don't reach the threshold are marked `EXPIRED` and removed
+- The author receives an in-app and email notification and can resubmit from their project page
+- The 2-week clock resets on every resubmit
 
 ### Build-in-Public Feed
-- Builders post updates tied to their projects
+- Post updates tied to any of your projects
 - Update types: **General**, **Milestone**, **Blocker**, **Breakthrough**
-- Updates are filterable by type on the feed page
+- Filter the feed by update type
 - Each update can receive comments
 
 ### Builder Profiles
-- Every registered user gets a profile page at `/builders/[username]`
-- Profile shows bio, social links (Twitter, GitHub, website), wallet address, and all published projects
-- Follower and following counts are displayed
-- Projects and update counts shown as stats
+- Profile page at `/builders/[username]`
+- Displays name, avatar, bio, social links (Twitter, GitHub, website), wallet address, and all published projects
+- Follower/following counts and project/update stats
+- Profile editing at `/settings` — display name, avatar, bio, handles, wallet address
 
 ### Follow System
-- Follow/unfollow any builder from their profile page
-- Follower count updates in real time
+- Follow/unfollow any builder from their profile
+- Following subscribes you to their new project and update notifications
 - Cannot follow yourself
-- Following a builder triggers notifications for their activity
 
 ### Notifications
-- Bell icon in the header with a real-time unread count badge
+- Bell icon in the header with unread count badge
 - Dropdown shows the last 20 notifications
-- Full notifications page at `/notifications` — grouped by Today, Yesterday, This week, Older
-- Visiting `/notifications` automatically marks all as read
-- Individual notifications can be marked read from the dropdown
-
-**Notification triggers:**
-| Event | Recipient |
-|-------|-----------|
-| Someone follows you | You |
-| A review is submitted on your project | You (with running count) |
-| Your project reaches 3 approvals and is published | You |
-| Your project reaches 3 rejections and is sent back | You |
-| A builder you follow submits a new project | You |
-| A builder you follow posts a feed update | You |
-| Someone comments on your project | You |
-| Someone replies to your discussion | You |
+- Full history at `/notifications` — grouped by Today, Yesterday, This week, Older
+- Visiting `/notifications` marks all as read
 
 ### Discussion Board
 - Community forum at `/discuss`
 - Categories: **General**, **Help**, **Ideas**, **Showcase**
-- Discussions can be pinned by admins
 - Threaded replies
-- Discussions bump to the top when a new reply is posted
 
 ### Comments
 - Comments on project pages
-- Authors can delete their own comments
-- Sign-in required to comment
+- Sign-in required; authors can delete their own comments
 
 ### Upvoting
 - One upvote per user per project
-- Upvoting a project that hits 5 upvotes restores one submission credit to the author (one-time per project)
-- Upvotes also increment the author's reputation score (+5)
+- Upvoting a project that hits 5 upvotes restores one submission credit to the author (once per project)
 
-### Review Queue
-- Accessible at `/review` — only visible in the nav to eligible reviewers
-- Shows all pending projects the current user has not yet reviewed and did not author
-- Displays approval/rejection progress bars per project
-- Full project detail view with existing reviewer feedback before submitting a review
+### Onboarding
+- First-time OAuth sign-in redirects to `/onboarding`
+- User picks a username and writes a bio before reaching the app
+- All protected pages redirect to `/onboarding` if the user has no username
+
+### "Remix This" Fork Flow
+- Any builder can fork another builder's project from the project page
+- Remix retains a visible attribution banner linking back to the source project
+- The original `remixedFromId` is stored on the forked project
 
 ---
 
@@ -126,7 +115,9 @@ Every project submission goes through a community review process before it goes 
 | Authentication | NextAuth v5 | ^5.0.0-beta.25 |
 | Auth Adapter | @auth/prisma-adapter | ^2.7.2 |
 | Validation | Zod | ^3.23.8 |
-| Class Utilities | clsx + tailwind-merge | latest |
+| File Storage | Vercel Blob | ^2.4.0 |
+| Email | Resend (raw fetch) | — |
+| Animation | Framer Motion | ^11 |
 | Runtime | Node.js | 24 LTS |
 | Deployment | Vercel | — |
 
@@ -135,86 +126,76 @@ Every project submission goes through a community review process before it goes 
 ## Project Structure
 
 ```
-genlayer-builders-hub/
+genhub/
 ├── prisma/
 │   ├── schema.prisma        # Full database schema
-│   └── seed.ts              # Seed script (sample builders + projects)
+│   └── seed.ts              # Seed script
 ├── src/
 │   ├── app/
-│   │   ├── (auth)/
-│   │   │   └── login/       # OAuth sign-in page
-│   │   ├── actions/
-│   │   │   └── projects.ts  # Server action: createProject
+│   │   ├── (auth)/login/    # OAuth sign-in page
 │   │   ├── api/
-│   │   │   ├── auth/[...nextauth]/  # NextAuth route handler
+│   │   │   ├── auth/[...nextauth]/
 │   │   │   ├── builders/[username]/follow/
 │   │   │   ├── comments/
+│   │   │   ├── cron/expire-projects/  # Daily expiry cron
 │   │   │   ├── discussions/
 │   │   │   ├── feed/
 │   │   │   ├── notifications/
-│   │   │   └── projects/
-│   │   │       └── [id]/
-│   │   │           ├── review/
-│   │   │           └── upvote/
+│   │   │   ├── projects/
+│   │   │   │   └── [id]/
+│   │   │   │       ├── resubmit/
+│   │   │   │       ├── review/
+│   │   │   │       ├── upvote/
+│   │   │   │       └── verify/
+│   │   │   └── user/
+│   │   │       └── avatar/  # Vercel Blob avatar upload
 │   │   ├── builders/
 │   │   │   ├── page.tsx          # Builder directory
 │   │   │   └── [username]/       # Builder profile
 │   │   ├── discuss/
-│   │   │   ├── page.tsx          # Discussion board
-│   │   │   ├── new/              # New discussion form
-│   │   │   └── [id]/             # Discussion thread
-│   │   ├── feed/                 # Build-in-public feed
-│   │   ├── notifications/        # Full notifications page
+│   │   ├── feed/
+│   │   ├── notifications/
+│   │   ├── onboarding/           # First-time username setup
 │   │   ├── projects/
 │   │   │   ├── page.tsx          # Project gallery
-│   │   │   ├── submit/           # Submit project form
-│   │   │   └── [slug]/           # Individual project page
-│   │   ├── review/
-│   │   │   ├── page.tsx          # Review queue
-│   │   │   └── [id]/             # Review a specific project
-│   │   ├── globals.css           # Tailwind directives + CSS variables
-│   │   ├── layout.tsx            # Root layout
+│   │   │   ├── submit/
+│   │   │   ├── remix/[slug]/     # Fork a project
+│   │   │   └── [slug]/           # Project detail
+│   │   ├── review/               # Review queue (retained, hidden from nav)
+│   │   ├── settings/             # Profile editing
+│   │   ├── globals.css
+│   │   ├── layout.tsx
 │   │   ├── page.tsx              # Landing page
-│   │   └── providers.tsx         # SessionProvider wrapper
+│   │   └── providers.tsx
 │   ├── components/
+│   │   ├── brand/
 │   │   ├── builders/
-│   │   │   ├── builder-card.tsx
-│   │   │   └── follow-button.tsx
 │   │   ├── comments/
-│   │   │   └── comment-section.tsx
 │   │   ├── discuss/
-│   │   │   ├── discussion-card.tsx
-│   │   │   ├── new-discussion-form.tsx
-│   │   │   └── reply-form.tsx
 │   │   ├── feed/
-│   │   │   └── feed-item.tsx
+│   │   ├── landing/
 │   │   ├── layout/
-│   │   │   ├── header.tsx
-│   │   │   └── footer.tsx
 │   │   ├── notifications/
-│   │   │   └── notification-bell.tsx
-│   │   ├── projects/
-│   │   │   ├── project-card.tsx
-│   │   │   └── submit-form.tsx
-│   │   └── review/
-│   │       └── review-form.tsx
+│   │   └── projects/
+│   │       ├── project-card.tsx
+│   │       ├── remix-button.tsx
+│   │       ├── resubmit-button.tsx
+│   │       ├── submit-form.tsx
+│   │       ├── upvote-button.tsx
+│   │       └── verify-button.tsx
 │   ├── lib/
-│   │   ├── auth.ts           # NextAuth config (GitHub + Google providers)
-│   │   ├── db.ts             # Prisma client singleton
-│   │   ├── notifications.ts  # notifyUser() + notifyFollowers() helpers
-│   │   ├── review.ts         # canReview() — Option A/B gate
-│   │   ├── utils.ts          # cn(), slugify(), formatRelativeDate(), constants
-│   │   └── validations.ts    # Zod schemas for all forms and APIs
+│   │   ├── auth.ts           # NextAuth config (GitHub + Google)
+│   │   ├── db.ts             # Prisma singleton
+│   │   ├── email.ts          # Resend raw fetch helper
+│   │   ├── notifications.ts  # notifyUser() + notifyFollowers()
+│   │   ├── utils.ts          # cn(), slugify(), constants
+│   │   └── validations.ts    # Zod schemas
 │   └── types/
-│       └── index.ts          # TypeScript types extending Prisma models
+│       └── next-auth.d.ts    # Session type augmentation
+├── vercel.json               # Cron job schedule
 ├── .env.example
-├── .env.local                # Local secrets (not committed)
-├── .gitignore
-├── CLAUDE.md                 # Codebase documentation for AI-assisted development
 ├── next.config.ts
 ├── package.json
-├── postcss.config.mjs
-├── tailwind.config.ts
 └── tsconfig.json
 ```
 
@@ -225,14 +206,14 @@ genlayer-builders-hub/
 ### Prerequisites
 
 - Node.js 20 or higher
-- A PostgreSQL database (Neon free tier recommended)
+- A PostgreSQL database ([Neon](https://neon.tech) free tier recommended)
 - GitHub and/or Google OAuth app credentials
 
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/luch91/genlayer-builders-hub.git
-cd genlayer-builders-hub
+git clone https://github.com/luch91/genhub.git
+cd genhub
 ```
 
 ### 2. Install dependencies
@@ -247,29 +228,26 @@ npm install
 cp .env.example .env.local
 ```
 
-Fill in all values in `.env.local`. See [Environment Variables](#environment-variables) for details.
-
-Also create a `.env` file (used by Prisma CLI):
+Fill in all required values. Also create a `.env` file for the Prisma CLI:
 
 ```bash
-echo 'DATABASE_URL="your-connection-string-here"' > .env
+echo 'DATABASE_URL="your-connection-string"' > .env
 ```
 
-### 4. Push the database schema
+### 4. Push the schema and generate the client
 
 ```bash
 npm run db:push
+npm run db:generate
 ```
 
 ### 5. Seed the database (optional)
-
-Loads two sample builders, two sample projects, and two sample feed updates:
 
 ```bash
 npm run db:seed
 ```
 
-### 6. Start the development server
+### 6. Start the dev server
 
 ```bash
 npm run dev
@@ -281,151 +259,128 @@ Open [http://localhost:3000](http://localhost:3000).
 
 ## Environment Variables
 
-### `.env.local` (Next.js)
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `DATABASE_URL` | Yes | PostgreSQL connection string |
+| `AUTH_SECRET` | Yes | NextAuth secret — `openssl rand -base64 32` |
+| `AUTH_GITHUB_ID` | Yes | GitHub OAuth app client ID |
+| `AUTH_GITHUB_SECRET` | Yes | GitHub OAuth app client secret |
+| `AUTH_GOOGLE_ID` | Yes | Google OAuth client ID |
+| `AUTH_GOOGLE_SECRET` | Yes | Google OAuth client secret |
+| `NEXT_PUBLIC_APP_URL` | Yes | Public base URL (e.g. `https://community.genhub.fun`) |
+| `BLOB_READ_WRITE_TOKEN` | Yes | Vercel Blob token for avatar uploads |
+| `RESEND_API_KEY` | Optional | Resend API key — emails are silently skipped if absent |
+| `EMAIL_FROM` | Optional | Sender address (default: `GenHub <noreply@genhub.fun>`) |
+| `GENLAYER_RPC_URL` | Optional | GenLayer JSON-RPC URL (default: `https://studio.genlayer.com:8443/api`) |
 
-| Variable | Description |
-|----------|-------------|
-| `DATABASE_URL` | PostgreSQL connection string |
-| `AUTH_SECRET` | NextAuth secret — generate with `openssl rand -base64 32` |
-| `AUTH_GITHUB_ID` | GitHub OAuth app client ID |
-| `AUTH_GITHUB_SECRET` | GitHub OAuth app client secret |
-| `AUTH_GOOGLE_ID` | Google OAuth client ID |
-| `AUTH_GOOGLE_SECRET` | Google OAuth client secret |
-| `NEXT_PUBLIC_APP_URL` | Public base URL — `http://localhost:3000` for local dev |
+### OAuth callback URLs
 
-### `.env` (Prisma CLI)
-
-Prisma reads from `.env`, not `.env.local`. This file only needs `DATABASE_URL`.
-
+**GitHub** — add to your OAuth app under "Authorization callback URL":
 ```
-DATABASE_URL="postgresql://..."
+http://localhost:3000/api/auth/callback/github
+https://community.genhub.fun/api/auth/callback/github
 ```
 
-Both files are gitignored.
-
-### Setting up OAuth providers
-
-**GitHub:** Go to [github.com/settings/applications/new](https://github.com/settings/applications/new)
-- Callback URL: `http://localhost:3000/api/auth/callback/github`
-
-**Google:** Go to [console.cloud.google.com/apis/credentials](https://console.cloud.google.com/apis/credentials)
-- Redirect URI: `http://localhost:3000/api/auth/callback/google`
+**Google** — add to Authorized redirect URIs:
+```
+http://localhost:3000/api/auth/callback/google
+https://community.genhub.fun/api/auth/callback/google
+```
 
 ---
 
 ## Database
 
-GenHub uses **PostgreSQL 16**. [Neon](https://neon.tech) is recommended for both local development (serverless) and production.
+GenHub uses **PostgreSQL 16**. [Neon](https://neon.tech) is recommended.
 
-### Schema overview
+### Models
 
 | Model | Purpose |
 |-------|---------|
-| `User` | Builder profile — username, bio, social links, wallet address, submission credits, reputation score |
-| `Account` | NextAuth OAuth account links |
-| `Session` | NextAuth sessions |
-| `VerificationToken` | NextAuth email verification tokens |
-| `Project` | Submitted project with status, tags, contract address |
-| `ProjectTag` | Join table between Project and Tag |
+| `User` | Builder — username, bio, social links, wallet, credits, reputation |
+| `Account` / `Session` / `VerificationToken` | NextAuth tables |
+| `Project` | Submitted project with status, tags, publishedAt |
+| `ProjectTag` | Project ↔ Tag join table |
 | `Tag` | Predefined tag labels |
-| `ProjectUpdate` | Build-in-public feed posts (Milestone / Blocker / Breakthrough / General) |
-| `ProjectReview` | Community review decision (Approved / Rejected) with optional feedback |
-| `Comment` | Comments on projects or project updates |
+| `ProjectUpdate` | Build-in-public feed post |
+| `ProjectReview` | Community review (Approved/Rejected) |
+| `Comment` | Comment on a project or update |
 | `Upvote` | One per user per project |
-| `Discussion` | Community discussion board thread |
-| `Reply` | Reply to a discussion thread |
-| `Follow` | Builder-to-builder follow relationship |
-| `Notification` | In-app notification with type, message, link, and read state |
+| `Discussion` | Discussion board thread |
+| `Reply` | Reply to a discussion |
+| `Follow` | Builder-to-builder follow |
+| `Notification` | In-app notification |
 
 ### Project status flow
 
 ```
-DRAFT → PENDING_REVIEW → PUBLISHED
-                    ↘
-                     DRAFT (if 3 rejections)
+SUBMIT → PUBLISHED (instantly, publishedAt = now)
+              ↓  (< 5 upvotes after 14 days, via cron)
+           EXPIRED
+              ↓  (author resubmits, publishedAt reset)
+           PUBLISHED
 ```
-
-Submissions cost one credit and land in `PENDING_REVIEW`. Three community approvals publish the project. Three rejections return it to `DRAFT` with feedback.
 
 ---
 
 ## Development Scripts
 
 ```bash
-npm run dev          # Start dev server with Turbopack
-npm run build        # Production build
-npm run start        # Start production server
+npm run dev          # Dev server with Turbopack
+npm run build        # Production build (runs prisma generate first)
+npm run start        # Production server
 npm run lint         # ESLint
-npm run typecheck    # TypeScript check — no emit
+npm run typecheck    # tsc --noEmit
 
-npm run db:generate  # Regenerate Prisma client after schema changes
-npm run db:push      # Sync schema to DB without a migration file (dev only)
-npm run db:migrate   # Create migration file + apply (use for production changes)
-npm run db:studio    # Open Prisma Studio GUI at localhost:5555
-npm run db:seed      # Seed the database with sample data
+npm run db:generate  # Regenerate Prisma client
+npm run db:push      # Sync schema to DB (dev, no migration file)
+npm run db:migrate   # Create migration + apply (production)
+npm run db:studio    # Prisma Studio at localhost:5555
+npm run db:seed      # Seed with sample data
 ```
 
 ---
 
 ## Architecture
 
-### Rendering strategy
+### Rendering
 
-- **Server Components by default** — all pages fetch data directly on the server using Prisma
-- **Client Components** (`"use client"`) only where interactivity is required: forms, toggles, dropdowns, the notification bell
-- No separate API calls from pages — data is co-located with the page that needs it
+- **Server Components by default** — pages fetch data directly with Prisma
+- **`"use client"`** only for interactivity: forms, buttons, dropdowns, the notification bell, the upvote button
 
 ### Authentication
 
-`auth()` from `@/lib/auth` is used in Server Components and API routes:
+```ts
+// Server components and API routes
+const session = await auth()
+if (!session?.user) return Response.json({ error: "Unauthorized" }, { status: 401 })
+
+// Client components
+const { data: session } = useSession()
+```
+
+NextAuth v5 uses database sessions with `PrismaAdapter`. The session type is augmented in `src/types/next-auth.d.ts` to expose `session.user.id` (string) and `session.user.username` (string | null).
+
+### Onboarding redirect
+
+Every protected page checks for a missing username:
 
 ```ts
 const session = await auth()
-if (!session?.user) return new Response("Unauthorized", { status: 401 })
+if (session?.user && !session.user.username) redirect("/onboarding")
 ```
 
-Client components use `useSession()` from `next-auth/react` via the `SessionProvider` in `providers.tsx`.
-
 ### Database access
-
-Always import `db` from `@/lib/db`. The singleton pattern prevents connection pool exhaustion in development:
 
 ```ts
 import { db } from "@/lib/db"
 ```
 
-### Form validation
+The Prisma singleton prevents connection pool exhaustion in development.
 
-Every form is validated with Zod on both the client (for immediate user feedback) and server (for correctness). All schemas are defined in `src/lib/validations.ts`.
+### Validation
 
-### Notification system
-
-Notifications are created server-side using two helpers from `src/lib/notifications.ts`:
-
-```ts
-// Notify one user
-await notifyUser(userId, "COMMENT", "Alice commented on your project", "/projects/my-project")
-
-// Notify all followers of a user
-await notifyFollowers(authorId, "NEW_UPDATE", "Alice posted an update on MyProject", "/projects/my-project")
-```
-
-### Review eligibility
-
-The `canReview()` function in `src/lib/review.ts` contains the single eligibility check. Currently **Option A** — must have at least one published project. To evolve to **Option B** (reputation-based), replace the body with the commented-out reputation check.
-
-### Slug generation
-
-Project slugs are derived from the title via `slugify()`. If a collision is detected, a short random suffix is appended.
-
-### Next.js 15 dynamic params
-
-All dynamic route pages `await` their params:
-
-```ts
-export default async function Page({ params }: { params: Promise<{ slug: string }> }) {
-  const { slug } = await params
-```
+All forms are validated with Zod on both client and server. Schemas live in `src/lib/validations.ts`.
 
 ---
 
@@ -433,215 +388,209 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
 
 ### User (Builder)
 
-A registered community member. Created on first OAuth sign-in. Key fields:
-
-- `username` — unique, set during onboarding
+- `username` — unique, set during onboarding; URL key for profile
+- `name` — display name, editable; may differ from OAuth name
+- `image` — avatar URL; defaults to OAuth avatar, overridable via Vercel Blob upload
 - `bio`, `twitterHandle`, `githubHandle`, `website`, `walletAddress`
-- `submissionCredits` — starts at 2, spent on project submissions, earned back at 5 upvotes
-- `reputationScore` — incremented by publishing (+10) and hitting 5 upvotes (+5)
+- `submissionCredits` — starts at 2; spent on submission, earned back at 5 upvotes
+- `reputationScore` — incremented by upvotes and publishing
 
 ### Project
 
-The core entity. Key fields:
-
 - `slug` — unique, URL-safe identifier derived from title
-- `genlayerAngle` — required field: "What's only possible on GenLayer?"
+- `genlayerAngle` — required: "What's only possible on GenLayer?"
 - `contractAddress` + `verified` — optional on-chain proof
-- `status` — `DRAFT | PENDING_REVIEW | PUBLISHED | ARCHIVED`
-- `creditRestored` — ensures credit is only restored once per project milestone
-
-### ProjectUpdate
-
-A "build in public" post tied to a project. Types: `GENERAL | MILESTONE | BLOCKER | BREAKTHROUGH`. These populate the community feed.
-
-### ProjectReview
-
-A review from an eligible builder. `decision: APPROVED | REJECTED`. Feedback is optional on approval, required on rejection. One review per reviewer per project (enforced at DB level).
+- `status` — `DRAFT | PENDING_REVIEW | PUBLISHED | ARCHIVED | EXPIRED`
+- `publishedAt` — set when first published; reset on resubmit; used by the expiry cron
+- `remixedFromId` — nullable self-relation for the remix fork flow
 
 ---
 
-## Review System
+## Community Curation
 
-### Eligibility (Option A — current)
+Projects go live the moment they are submitted. The `publishedAt` timestamp starts the 2-week clock.
 
-A builder can review others' projects once they have **at least one published project** of their own. This is checked by `canReview()` in `src/lib/review.ts`.
+The daily cron job (`/api/cron/expire-projects`) runs at midnight UTC and:
+1. Finds all `PUBLISHED` projects where `publishedAt ≤ 14 days ago`
+2. Filters to those with fewer than 5 upvotes
+3. Sets their status to `EXPIRED`
+4. Sends an in-app + email notification to each author
 
-The "Review" nav link only appears for eligible builders.
+Authors can resubmit from their project page. On resubmit, `status` returns to `PUBLISHED` and `publishedAt` resets to the current time — the full 2-week window starts again, no credit cost.
 
-### Evolving to Option B (reputation-gated)
-
-When the community is large enough to warrant it, open `src/lib/review.ts` and replace the body of `canReview()` with the commented-out reputation check:
-
+The threshold constants live in `src/lib/utils.ts`:
 ```ts
-const user = await db.user.findUnique({ where: { id: userId }, select: { reputationScore: true } })
-return (user?.reputationScore ?? 0) >= REVIEW_THRESHOLDS.MIN_REPUTATION_TO_REVIEW
-```
-
-`MIN_REPUTATION_TO_REVIEW` is set to `50` in `src/lib/utils.ts`.
-
-### Thresholds
-
-All review thresholds live in `REVIEW_THRESHOLDS` in `src/lib/utils.ts`:
-
-```ts
-APPROVALS_NEEDED: 3
-REJECTIONS_NEEDED: 3
-UPVOTES_FOR_CREDIT: 5
-MIN_REPUTATION_TO_REVIEW: 50
+UPVOTES_FOR_CREDIT: 5      // also the gallery survival threshold
+EXPIRY_DAYS: 14
 ```
 
 ---
 
 ## Submission Credits
 
-| Action | Credit change |
-|--------|--------------|
-| Account created | +2 (starting balance) |
+| Action | Credits |
+|--------|---------|
+| Account created | +2 |
 | Project submitted | −1 |
 | Published project reaches 5 upvotes | +1 (once per project) |
 
-If a builder has 0 credits, they cannot submit until they earn one back. Credits are designed to prevent spam while rewarding builders whose work resonates with the community.
-
----
-
-## Reputation System
-
-Reputation is stored on `User.reputationScore` and is the foundation for the Option B review gate.
-
-| Event | Reputation change |
-|-------|-----------------|
-| Project published (3 approvals) | +10 |
-| Published project reaches 5 upvotes | +5 |
-
-Reputation is append-only — it never decreases. This means long-term contributors always maintain their eligibility.
+Zero credits = cannot submit until one is earned back.
 
 ---
 
 ## Follow System
 
-- Any signed-in builder can follow any other builder
-- A builder cannot follow themselves
-- Following is toggled via `POST /api/builders/[username]/follow`
-- Follower count is displayed on builder profiles
-- Following a builder subscribes you to their activity notifications (new projects, feed updates)
+- Follow/unfollow via `POST /api/builders/[username]/follow`
+- Cannot follow yourself
+- Following subscribes you to new project and feed update notifications
+- Follower count displayed on builder profiles
 
 ---
 
 ## Notifications
 
-Notifications are stored in the `Notification` table and delivered in-app only. There is no email delivery at this time.
+### In-app
 
-### Notification types
+All notifications are stored in the `Notification` table and shown via the bell icon in the header.
 
-| Type | Meaning |
+| Type | Trigger |
 |------|---------|
-| `FOLLOW` | Someone started following you |
-| `PROJECT_REVIEW` | A review was submitted on your project |
-| `PROJECT_PUBLISHED` | Your project reached 3 approvals and is now live |
-| `PROJECT_REJECTED` | Your project reached 3 rejections and needs revision |
-| `NEW_PROJECT` | A builder you follow submitted a new project |
-| `NEW_UPDATE` | A builder you follow posted a feed update |
-| `COMMENT` | Someone commented on your project |
-| `DISCUSSION_REPLY` | Someone replied to your discussion |
+| `FOLLOW` | Someone follows you |
+| `PROJECT_REVIEW` | A review is submitted on your project |
+| `PROJECT_PUBLISHED` | Your project is published |
+| `PROJECT_REJECTED` | Your project is sent back with feedback |
+| `PROJECT_EXPIRED` | Your project was removed for low upvotes |
+| `NEW_PROJECT` | A builder you follow submits a project |
+| `NEW_UPDATE` | A builder you follow posts a feed update |
+| `COMMENT` | Someone comments on your project |
+| `DISCUSSION_REPLY` | Someone replies to your discussion |
 
-### Reading notifications
+---
 
-- **Bell dropdown** — shows last 20, mark-all-read button, click to navigate
-- **`/notifications` page** — full history grouped by date, auto-marks all read on visit
+## Email Notifications
+
+Emails are sent via the [Resend](https://resend.com) REST API using a raw `fetch` call (no SDK). If `RESEND_API_KEY` is not set, all email sending is silently skipped — the app works without it.
+
+Email is sent for: `COMMENT`, `PROJECT_PUBLISHED`, `PROJECT_REJECTED`, `PROJECT_EXPIRED`, `FOLLOW`, `DISCUSSION_REPLY`.
+
+The `sendEmail()` helper lives in `src/lib/email.ts`. The `notifyUser()` and `notifyFollowers()` helpers in `src/lib/notifications.ts` call it automatically for email-eligible notification types.
+
+---
+
+## On-chain Contract Verification
+
+From a project page, the author can verify their contract address is deployed on GenLayer. Clicking "Verify contract" calls `POST /api/projects/[id]/verify`, which:
+
+1. Calls `eth_getCode` on the GenLayer JSON-RPC endpoint (`GENLAYER_RPC_URL`)
+2. If bytecode exists at the address, sets `project.verified = true`
+3. The project page then displays a verified badge
+
+Default RPC URL: `https://studio.genlayer.com:8443/api`.
+
+---
+
+## Remix Flow
+
+Any signed-in builder (other than the project author) sees a **"Remix This Project"** button on a published project's page. Clicking it:
+
+1. Navigates to `/projects/remix/[slug]`
+2. Shows the source project details and an attribution banner
+3. Pre-fills the submit form with the source project's title
+4. On submit, creates a new project with `remixedFromId` pointing to the original
+
+The forked project page shows a permanent attribution banner: *"Based on [original title]"*.
+
+---
+
+## Profile Management
+
+Builders edit their profile at `/settings`. Changes are saved via `PATCH /api/user`.
+
+**Editable fields:** display name, username, bio, Twitter handle, GitHub handle, website, wallet address.
+
+**Avatar upload:** selecting a photo on the settings page uploads it to Vercel Blob at `avatars/[userId]` (overwrites on each upload) via `POST /api/user/avatar`. Requires `BLOB_READ_WRITE_TOKEN`.
+
+Changing a username updates the profile URL — the settings page redirects to `/builders/[newUsername]` after saving.
+
+---
+
+## Cron Jobs
+
+Defined in `vercel.json`:
+
+| Path | Schedule | Purpose |
+|------|----------|---------|
+| `/api/cron/expire-projects` | `0 0 * * *` | Expire PUBLISHED projects older than 14 days with < 5 upvotes |
+
+Vercel automatically provides a `CRON_SECRET` environment variable in production. The cron endpoint verifies this header before running. In local development (no `CRON_SECRET` set), the endpoint runs without authentication — call it directly at `http://localhost:3000/api/cron/expire-projects`.
 
 ---
 
 ## API Reference
 
-All API routes return JSON. Errors always include `{ "error": "message" }` with the appropriate HTTP status code.
+All routes return JSON. Errors always return `{ "error": "message" }` with the appropriate HTTP status.
 
 ### Projects
 
-| Method | Path | Description |
-|--------|------|-------------|
-| `GET` | `/api/projects` | List published projects (supports `tag`, `sort`, `page` query params) |
-| `POST` | `/api/projects` | Submit a new project (requires auth + credits) |
-| `GET` | `/api/projects/[id]` | Get a single project |
-| `PATCH` | `/api/projects/[id]` | Update a project (author only) |
-| `DELETE` | `/api/projects/[id]` | Delete a project (author only) |
-| `POST` | `/api/projects/[id]/upvote` | Toggle upvote on a project |
-| `GET` | `/api/projects/[id]/review` | Get review summary for a project |
-| `POST` | `/api/projects/[id]/review` | Submit a review (eligible reviewers only) |
+| Method | Path | Auth | Description |
+|--------|------|------|-------------|
+| `GET` | `/api/projects` | No | List published projects (`tag`, `sort`, `page`) |
+| `POST` | `/api/projects` | Yes | Submit a project (costs 1 credit) |
+| `PATCH` | `/api/projects/[id]` | Author | Update project fields |
+| `POST` | `/api/projects/[id]/upvote` | Yes | Toggle upvote |
+| `POST` | `/api/projects/[id]/verify` | Author | Verify contract on-chain |
+| `POST` | `/api/projects/[id]/resubmit` | Author | Resubmit an expired project |
+| `POST` | `/api/projects/[id]/review` | Eligible reviewer | Submit approve/reject review |
+
+### User / Profile
+
+| Method | Path | Auth | Description |
+|--------|------|------|-------------|
+| `PATCH` | `/api/user` | Yes | Update profile fields |
+| `POST` | `/api/user/avatar` | Yes | Upload avatar to Vercel Blob |
 
 ### Feed
 
-| Method | Path | Description |
-|--------|------|-------------|
-| `GET` | `/api/feed` | List project updates (supports `type`, `projectId`, `page`) |
-| `POST` | `/api/feed` | Post a project update (project author only) |
+| Method | Path | Auth | Description |
+|--------|------|------|-------------|
+| `GET` | `/api/feed` | No | List updates (`type`, `projectId`, `page`) |
+| `POST` | `/api/feed` | Author | Post a project update |
 
 ### Comments
 
-| Method | Path | Description |
-|--------|------|-------------|
-| `POST` | `/api/comments` | Post a comment on a project or update |
-| `DELETE` | `/api/comments/[id]` | Delete a comment (author only) |
+| Method | Path | Auth | Description |
+|--------|------|------|-------------|
+| `POST` | `/api/comments` | Yes | Post a comment |
+| `DELETE` | `/api/comments/[id]` | Author | Delete a comment |
 
 ### Discussions
 
-| Method | Path | Description |
-|--------|------|-------------|
-| `GET` | `/api/discussions` | List discussions (supports `category`, `page`) |
-| `POST` | `/api/discussions` | Create a discussion (requires auth) |
-| `GET` | `/api/discussions/[id]` | Get a discussion with all replies |
-| `DELETE` | `/api/discussions/[id]` | Delete a discussion (author only) |
-| `POST` | `/api/discussions/[id]/replies` | Post a reply (requires auth) |
+| Method | Path | Auth | Description |
+|--------|------|------|-------------|
+| `GET` | `/api/discussions` | No | List discussions |
+| `POST` | `/api/discussions` | Yes | Create a discussion |
+| `DELETE` | `/api/discussions/[id]` | Author | Delete a discussion |
+| `POST` | `/api/discussions/[id]/replies` | Yes | Post a reply |
 
 ### Builders
 
-| Method | Path | Description |
-|--------|------|-------------|
-| `GET` | `/api/builders` | List builders |
-| `POST` | `/api/builders/[username]/follow` | Toggle follow/unfollow |
+| Method | Path | Auth | Description |
+|--------|------|------|-------------|
+| `POST` | `/api/builders/[username]/follow` | Yes | Toggle follow/unfollow |
 
 ### Notifications
 
-| Method | Path | Description |
-|--------|------|-------------|
-| `GET` | `/api/notifications` | Get notifications for current user (supports `page`) |
-| `POST` | `/api/notifications` | Mark all notifications as read |
-| `POST` | `/api/notifications/[id]/read` | Mark one notification as read |
+| Method | Path | Auth | Description |
+|--------|------|------|-------------|
+| `GET` | `/api/notifications` | Yes | Get notifications (`page`) |
+| `POST` | `/api/notifications` | Yes | Mark all as read |
+| `POST` | `/api/notifications/[id]/read` | Yes | Mark one as read |
 
-### Auth
+### Cron
 
-| Method | Path | Description |
-|--------|------|-------------|
-| `GET/POST` | `/api/auth/[...nextauth]` | NextAuth handler (OAuth callbacks) |
-
----
-
-## Roadmap
-
-### Completed
-- [x] Project gallery with tag and sort filtering
-- [x] Project submission with community review gate
-- [x] Build-in-public feed with update types
-- [x] Builder profiles
-- [x] Comments on projects
-- [x] Community discussion board with threaded replies
-- [x] Upvoting with credit restoration
-- [x] Submission credit system
-- [x] Reputation scoring (foundation for Option B review gate)
-- [x] Community review queue (Option A: published project required)
-- [x] Follow system
-- [x] In-app notifications
-
-### Planned
-- [ ] Builder onboarding flow (username selection after first OAuth sign-in)
-- [ ] Project editing and resubmission after rejection
-- [ ] Appeal mechanism for repeatedly rejected projects
-- [ ] Email notifications
-- [ ] On-chain contract address verification
-- [ ] "Remix This" project fork flow
-- [ ] Weekly community challenges and bounties
-- [ ] Review eligibility upgrade to Option B (reputation-gated) when community scales
-- [ ] Live streaming for builders (pending: active feed, notification infrastructure already in place)
-- [ ] Admin dashboard for pinning discussions and moderating content
+| Method | Path | Auth | Description |
+|--------|------|------|-------------|
+| `GET` | `/api/cron/expire-projects` | `CRON_SECRET` | Run project expiry job |
 
 ---
 
