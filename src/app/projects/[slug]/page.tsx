@@ -226,20 +226,30 @@ export default async function ProjectPage({ params }: PageProps) {
           </div>
 
           {/* Actions */}
-          {project.status === "PUBLISHED" && (
-            <div className="space-y-2">
-              <RemixButton
-                slug={project.slug}
-                currentUserId={session?.user?.id}
-                authorId={project.authorId}
-              />
-              {session?.user?.id === project.authorId &&
-                project.contractAddress &&
-                !project.verified && (
-                  <VerifyButton projectId={project.id} />
-                )}
-            </div>
-          )}
+          <div className="space-y-2">
+            {session?.user?.id === project.authorId && (
+              <Link
+                href={`/projects/${project.slug}/edit`}
+                className="flex w-full items-center justify-center rounded-xl border border-brand-indigo/20 px-4 py-2 font-ui text-sm font-medium text-brand-navy/65 transition-colors hover:border-brand-indigo/40 hover:text-brand-navy"
+              >
+                Edit project
+              </Link>
+            )}
+            {project.status === "PUBLISHED" && (
+              <>
+                <RemixButton
+                  slug={project.slug}
+                  currentUserId={session?.user?.id}
+                  authorId={project.authorId}
+                />
+                {session?.user?.id === project.authorId &&
+                  project.contractAddress &&
+                  !project.verified && (
+                    <VerifyButton projectId={project.id} />
+                  )}
+              </>
+            )}
+          </div>
 
           {/* Author */}
           <div className="card">
