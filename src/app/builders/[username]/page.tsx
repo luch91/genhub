@@ -1,6 +1,7 @@
 import type { Metadata } from "next"
 import { notFound } from "next/navigation"
 import Image from "next/image"
+import Link from "next/link"
 import { db } from "@/lib/db"
 import { auth } from "@/lib/auth"
 import { ProjectCard } from "@/components/projects/project-card"
@@ -108,7 +109,14 @@ export default async function BuilderProfilePage({ params }: PageProps) {
               <div className="text-xs text-brand-navy/45">Updates</div>
             </div>
           </div>
-          {session?.user?.id !== builder.id && (
+          {session?.user?.id === builder.id ? (
+            <Link
+              href="/settings"
+              className="rounded-xl border border-brand-indigo/20 px-4 py-2 font-ui text-sm font-medium text-brand-navy/65 transition-colors hover:border-brand-indigo/40 hover:text-brand-navy"
+            >
+              Edit profile
+            </Link>
+          ) : (
             <FollowButton
               username={builder.username!}
               initialFollowing={isFollowing}
