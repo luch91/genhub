@@ -52,13 +52,13 @@ export function ProfileForm({ defaultValues }: Props) {
     }
 
     const body = {
-      name:          (form.elements.namedItem("name")          as HTMLInputElement).value.trim() || null,
+      name:          (form.elements.namedItem("name")          as HTMLInputElement).value.trim(),
       username:      (form.elements.namedItem("username")      as HTMLInputElement).value.trim(),
-      bio:           (form.elements.namedItem("bio")           as HTMLTextAreaElement).value.trim() || null,
-      twitterHandle: (form.elements.namedItem("twitterHandle") as HTMLInputElement).value.trim() || null,
-      githubHandle:  (form.elements.namedItem("githubHandle")  as HTMLInputElement).value.trim() || null,
-      website:       (form.elements.namedItem("website")       as HTMLInputElement).value.trim() || null,
-      walletAddress: (form.elements.namedItem("walletAddress") as HTMLInputElement).value.trim() || null,
+      bio:           (form.elements.namedItem("bio")           as HTMLTextAreaElement).value.trim(),
+      twitterHandle: (form.elements.namedItem("twitterHandle") as HTMLInputElement).value.trim(),
+      githubHandle:  (form.elements.namedItem("githubHandle")  as HTMLInputElement).value.trim(),
+      website:       (form.elements.namedItem("website")       as HTMLInputElement).value.trim(),
+      walletAddress: (form.elements.namedItem("walletAddress") as HTMLInputElement).value.trim(),
     }
 
     const res = await fetch("/api/user", {
