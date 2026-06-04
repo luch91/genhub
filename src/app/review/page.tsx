@@ -35,6 +35,7 @@ async function getPendingProjects(userId: string) {
 export default async function ReviewQueuePage() {
   const session = await auth()
   if (!session?.user) redirect("/login")
+  if (!session.user.username) redirect("/onboarding")
 
   const eligible = await canReview(session.user.id)
   if (!eligible) {

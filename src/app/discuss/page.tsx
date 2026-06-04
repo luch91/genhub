@@ -1,4 +1,5 @@
 import type { Metadata } from "next"
+import { redirect } from "next/navigation"
 import Link from "next/link"
 import { db } from "@/lib/db"
 import { auth } from "@/lib/auth"
@@ -37,6 +38,7 @@ async function getDiscussions(category?: string) {
 export default async function DiscussPage({ searchParams }: PageProps) {
   const { category } = await searchParams
   const session = await auth()
+  if (session?.user && !session.user.username) redirect("/onboarding")
   const discussions = await getDiscussions(category)
 
   return (

@@ -34,7 +34,7 @@ export const projectSubmitSchema = z.object({
     .optional()
     .or(z.literal("")),
   tags: z
-    .array(z.enum(PREDEFINED_TAGS as [string, ...string[]]))
+    .array(z.enum([...PREDEFINED_TAGS] as [string, ...string[]]))
     .min(1, "Select at least one tag")
     .max(5, "Select up to 5 tags"),
 })

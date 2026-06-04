@@ -70,7 +70,7 @@ function FeatureCard({ feature, index }: { feature: (typeof FEATURES)[number]; i
       whileInView={reduced ? {} : { opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-60px" }}
       transition={{ duration: 0.6, delay: index * 0.08, ease: [0.22, 1, 0.36, 1] }}
-      style={reduced ? {} : { y, scale } as React.CSSProperties}
+      style={reduced ? {} : { y, scale } as unknown as React.CSSProperties}
       className={feature.size === "large" ? "col-span-1 md:col-span-2" : "col-span-1"}
     >
       <GlassCard className="group h-full p-6 transition-all duration-200 hover:scale-[1.015]">

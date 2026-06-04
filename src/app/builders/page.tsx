@@ -1,4 +1,6 @@
 import type { Metadata } from "next"
+import { redirect } from "next/navigation"
+import { auth } from "@/lib/auth"
 import { db } from "@/lib/db"
 import { BuilderCard } from "@/components/builders/builder-card"
 
@@ -13,6 +15,9 @@ async function getBuilders() {
 }
 
 export default async function BuildersPage() {
+  const session = await auth()
+  if (session?.user && !session.user.username) redirect("/onboarding")
+
   const builders = await getBuilders()
 
   return (
