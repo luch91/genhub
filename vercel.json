@@ -4,10 +4,5 @@
       "path": "/api/cron/expire-projects",
       "schedule": "0 0 * * *"
     }
-  ],
-  "functions": {
-    "src/app/api/spaces/**": {
-      "runtime": "nodejs20.x"
-    }
-  }
+  ]
 }
