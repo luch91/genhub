@@ -1,10 +1,9 @@
 "use client"
 
-import { useEffect, useRef, useCallback } from "react"
-import { Howl } from "howler"
+import { useCallback } from "react"
 
 // Module-level mute state shared across all hook instances
-let _muted = false
+let _muted = true
 const _listeners = new Set<() => void>()
 
 export function setSoundMuted(muted: boolean) {
@@ -18,53 +17,72 @@ export function getSoundMuted() {
 
 type SoundKey = "hover" | "click" | "tick"
 
-const SOUND_SRCS: Record<SoundKey, string> = {
-  hover: "/sounds/hover.mp3",
-  click: "/sounds/click.mp3",
-  tick: "/sounds/tick.mp3",
+// Lazy AudioContext — created on first play() after a user gesture
+let _ctx: AudioContext | null = null
+
+function getCtx(): AudioContext | null {
+  if (typeof window === "undefined") return null
+  try {
+    if (!_ctx) _ctx = new AudioContext()
+    if (_ctx.state === "suspended") _ctx.resume().catch(() => {})
+    return _ctx
+  } catch {
+    return null
+  }
 }
 
-const SOUND_VOLUMES: Record<SoundKey, number> = {
-  hover: 0.15,
-  click: 0.3,
-  tick: 0.08,
+type SoundConfig = {
+  frequency: number
+  duration: number
+  type: OscillatorType
+  volume: number
+  attackTime: number
+}
+
+const SOUNDS: Record<SoundKey, SoundConfig> = {
+  hover: { frequency: 880,  duration: 0.09, type: "sine", volume: 0.06, attackTime: 0.005 },
+  click: { frequency: 440,  duration: 0.07, type: "sine", volume: 0.14, attackTime: 0.003 },
+  tick:  { frequency: 1200, duration: 0.05, type: "sine", volume: 0.04, attackTime: 0.002 },
+}
+
+function synthesize(key: SoundKey): void {
+  const ctx = getCtx()
+  if (!ctx) return
+
+  const { frequency, duration, type, volume, attackTime } = SOUNDS[key]
+  const now = ctx.currentTime
+
+  const osc  = ctx.createOscillator()
+  const gain = ctx.createGain()
+
+  osc.connect(gain)
+  gain.connect(ctx.destination)
+
+  osc.type = type
+  osc.frequency.setValueAtTime(frequency, now)
+
+  gain.gain.setValueAtTime(0, now)
+  gain.gain.linearRampToValueAtTime(volume, now + attackTime)
+  gain.gain.exponentialRampToValueAtTime(0.0001, now + duration)
+
+  osc.start(now)
+  osc.stop(now + duration + 0.01)
+  osc.onended = () => { osc.disconnect(); gain.disconnect() }
 }
 
 export function useSound() {
-  const sounds = useRef<Partial<Record<SoundKey, Howl>>>({})
-  const reduced = useRef(false)
+  const prefersReduced =
+    typeof window !== "undefined"
+      ? window.matchMedia("(prefers-reduced-motion: reduce)").matches
+      : false
 
-  useEffect(() => {
-    reduced.current = window.matchMedia("(prefers-reduced-motion: reduce)").matches
-
-    // Load sounds lazily — fail silently if files are missing
-    const keys: SoundKey[] = ["hover", "click", "tick"]
-    keys.forEach((key) => {
-      try {
-        sounds.current[key] = new Howl({
-          src: [SOUND_SRCS[key]],
-          volume: SOUND_VOLUMES[key],
-          preload: false,
-          onloaderror: () => {
-            // Sound file missing — gracefully no-op
-            delete sounds.current[key]
-          },
-        })
-      } catch {
-        // Howler not available in this environment
-      }
-    })
-
-    return () => {
-      Object.values(sounds.current).forEach((h) => h?.unload())
-      sounds.current = {}
-    }
-  }, [])
-
-  const play = useCallback((key: SoundKey) => {
-    if (_muted || reduced.current) return
-    sounds.current[key]?.play()
-  }, [])
+  const play = useCallback(
+    (key: SoundKey) => {
+      if (_muted || prefersReduced) return
+      synthesize(key)
+    },
+    [prefersReduced]
+  )
 
   return { play }
 }
