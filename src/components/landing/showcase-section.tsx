@@ -1,46 +1,35 @@
-"use client"
-
 import { motion } from "framer-motion"
-import { GlassCard } from "@/components/brand/glass-card"
+import { db } from "@/lib/db"
+import { ShowcaseGrid } from "./showcase-grid"
 
-const MEMBERS = [
-  { name: "Pavel",       initials: "PV", avatarColor: "#4f46e5" },
-  { name: "emark",       initials: "EM", avatarColor: "#fbbf24" },
-  { name: "Mr Network",  initials: "MN", avatarColor: "#6366f1" },
-  { name: "JayDeculein", initials: "JD", avatarColor: "#1a1a2e" },
-  { name: "Dude",        initials: "DU", avatarColor: "#818cf8" },
-  { name: "Gen.Dave",    initials: "GD", avatarColor: "#f59e0b" },
-  { name: "Ying",        initials: "YI", avatarColor: "#4f46e5" },
-  { name: "gaymused",    initials: "GM", avatarColor: "#a5b4fc" },
-]
+async function getTopBuilders() {
+  const candidates = await db.user.findMany({
+    where: {
+      projects: { some: { status: "PUBLISHED" } },
+    },
+    orderBy: { reputationScore: "desc" },
+    take: 50,
+    select: {
+      id:       true,
+      name:     true,
+      username: true,
+      image:    true,
+      _count: {
+        select: {
+          projects: { where: { status: "PUBLISHED" } },
+        },
+      },
+    },
+  })
 
-function MemberCard({ member, index }: { member: (typeof MEMBERS)[number]; index: number }) {
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 32 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-40px" }}
-      transition={{ duration: 0.55, delay: index * 0.07, ease: [0.22, 1, 0.36, 1] }}
-    >
-      <GlassCard className="group h-full p-5 transition-all duration-200 hover:scale-[1.02]">
-        <div className="flex items-center gap-3">
-          <span
-            className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full font-mono text-sm font-bold text-white ring-2 ring-brand-indigo-3/30"
-            style={{ backgroundColor: member.avatarColor }}
-          >
-            {member.initials}
-          </span>
-          <div>
-            <div className="font-ui text-sm font-bold text-brand-navy">{member.name}</div>
-            <div className="font-mono text-[10px] text-brand-indigo/60">GenLayer Builder</div>
-          </div>
-        </div>
-      </GlassCard>
-    </motion.div>
-  )
+  return candidates.filter((b) => b._count.projects >= 5).slice(0, 8)
 }
 
-export function ShowcaseSection() {
+export async function ShowcaseSection() {
+  const builders = await getTopBuilders()
+
+  if (builders.length === 0) return null
+
   return (
     <section id="community" className="relative overflow-hidden bg-brand-cream px-6 py-24">
       {/* Tile pattern background */}
@@ -75,12 +64,7 @@ export function ShowcaseSection() {
           </p>
         </motion.div>
 
-        {/* Grid */}
-        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
-          {MEMBERS.map((m, i) => (
-            <MemberCard key={m.name} member={m} index={i} />
-          ))}
-        </div>
+        <ShowcaseGrid builders={builders} />
       </div>
     </section>
   )
