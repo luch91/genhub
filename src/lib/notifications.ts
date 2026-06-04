@@ -2,6 +2,15 @@ import { db } from "./db"
 import { sendEmail } from "./email"
 import type { NotificationType } from "@prisma/client"
 
+function escapeHtml(str: string): string {
+  return str
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#x27;")
+}
+
 const EMAIL_TYPES = new Set<NotificationType>([
   "COMMENT",
   "PROJECT_PUBLISHED",
@@ -30,6 +39,7 @@ export async function notifyUser(
     })
     if (user?.email) {
       const href = link ? `${APP_URL}${link}` : APP_URL
+      const safeMessage = escapeHtml(message)
       await sendEmail({
         to: user.email,
         subject: `GenHub: ${message}`,
@@ -38,7 +48,7 @@ export async function notifyUser(
             <div style="margin-bottom:24px">
               <span style="font-size:20px;font-weight:900;color:#1a1a2e;letter-spacing:-0.5px">GenHub</span>
             </div>
-            <p style="color:#1a1a2e;font-size:15px;line-height:1.6;margin:0 0 20px">${message}</p>
+            <p style="color:#1a1a2e;font-size:15px;line-height:1.6;margin:0 0 20px">${safeMessage}</p>
             ${link ? `<a href="${href}" style="display:inline-block;background:#4f46e5;color:#fff;text-decoration:none;padding:10px 20px;border-radius:99px;font-size:14px;font-weight:600">View on GenHub →</a>` : ""}
             <p style="color:#1a1a2e;opacity:0.4;font-size:12px;margin-top:32px">
               You're receiving this because you have an account on GenHub.
@@ -78,6 +88,7 @@ export async function notifyFollowers(
       .findMany({ where: { id: { in: followerIds } }, select: { email: true, name: true } })
       .then(async (users) => {
         const href = link ? `${APP_URL}${link}` : APP_URL
+        const safeMessage = escapeHtml(message)
         for (const user of users) {
           if (!user.email) continue
           await sendEmail({
@@ -88,7 +99,7 @@ export async function notifyFollowers(
                 <div style="margin-bottom:24px">
                   <span style="font-size:20px;font-weight:900;color:#1a1a2e;letter-spacing:-0.5px">GenHub</span>
                 </div>
-                <p style="color:#1a1a2e;font-size:15px;line-height:1.6;margin:0 0 20px">${message}</p>
+                <p style="color:#1a1a2e;font-size:15px;line-height:1.6;margin:0 0 20px">${safeMessage}</p>
                 ${link ? `<a href="${href}" style="display:inline-block;background:#4f46e5;color:#fff;text-decoration:none;padding:10px 20px;border-radius:99px;font-size:14px;font-weight:600">View on GenHub →</a>` : ""}
                 <p style="color:#1a1a2e;opacity:0.4;font-size:12px;margin-top:32px">
                   You're receiving this because you follow this builder on GenHub.

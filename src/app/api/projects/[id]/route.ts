@@ -8,6 +8,8 @@ type Params = { params: Promise<{ id: string }> }
 
 export async function GET(_: NextRequest, { params }: Params) {
   const { id } = await params
+  const session = await auth()
+
   const project = await db.project.findUnique({
     where: { id },
     include: {
@@ -18,6 +20,12 @@ export async function GET(_: NextRequest, { params }: Params) {
   })
 
   if (!project) return Response.json({ error: "Not found" }, { status: 404 })
+
+  // Non-published projects are only visible to their author
+  if (project.status !== "PUBLISHED" && project.authorId !== session?.user?.id) {
+    return Response.json({ error: "Not found" }, { status: 404 })
+  }
+
   return Response.json(project)
 }
 

@@ -34,6 +34,17 @@ export async function PATCH(request: NextRequest) {
       ...(result.data.website !== undefined && { website: result.data.website || null }),
       ...(result.data.walletAddress !== undefined && { walletAddress: result.data.walletAddress || null }),
     },
+    select: {
+      id:            true,
+      name:          true,
+      username:      true,
+      bio:           true,
+      image:         true,
+      twitterHandle: true,
+      githubHandle:  true,
+      website:       true,
+      walletAddress: true,
+    },
   })
 
   return Response.json(user)

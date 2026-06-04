@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server"
 import { auth } from "@/lib/auth"
 import { db } from "@/lib/db"
+import { createBuilderSessionSchema } from "@/lib/validations"
 import { extractYouTubeId } from "@/lib/utils"
 
 export async function PATCH(
@@ -13,7 +14,6 @@ export async function PATCH(
   }
 
   const { id }   = await params
-  const body     = await req.json()
   const existing = await db.builderSession.findUnique({ where: { id } })
 
   if (!existing) return NextResponse.json({ error: "Not found" }, { status: 404 })
@@ -21,13 +21,27 @@ export async function PATCH(
     return NextResponse.json({ error: "Forbidden" }, { status: 403 })
   }
 
-  const youtubeVideoId = body.youtubeUrl
-    ? extractYouTubeId(body.youtubeUrl)
-    : existing.youtubeVideoId
+  const body   = await req.json()
+  const parsed = createBuilderSessionSchema.partial().safeParse(body)
+  if (!parsed.success) {
+    return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 })
+  }
+
+  // Destructure tags (not a direct DB field) and youtubeUrl (needs ID extraction)
+  const { tags: _tags, youtubeUrl, ...safeData } = parsed.data
+
+  const youtubeVideoId =
+    youtubeUrl !== undefined
+      ? extractYouTubeId(youtubeUrl ?? "")
+      : existing.youtubeVideoId
 
   const updated = await db.builderSession.update({
     where: { id },
-    data: { ...body, youtubeVideoId },
+    data: {
+      ...safeData,
+      ...(youtubeUrl !== undefined && { youtubeUrl: youtubeUrl || null }),
+      youtubeVideoId,
+    },
   })
 
   return NextResponse.json(updated)
