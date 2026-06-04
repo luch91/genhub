@@ -32,7 +32,7 @@ const FEATURES = [
   },
   {
     title: "Builder Profiles",
-    body:  "Showcase your portfolio, connect your wallet, and let others follow your journey.",
+    body:  "Showcase your portfolio and let others follow your journey.",
     size:  "small",
     iconIdx: 2,
   },
