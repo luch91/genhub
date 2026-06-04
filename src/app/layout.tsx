@@ -16,6 +16,7 @@ const dmSans       = DM_Sans({ subsets: ["latin"], weight: ["300", "400"], varia
 const spaceMono    = Space_Mono({ subsets: ["latin"], weight: ["400", "700"], variable: "--font-space-mono" })
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000"),
   title: {
     default: "GenHub — A Home for GenLayer Builders",
     template: "%s | GenHub",
@@ -26,6 +27,11 @@ export const metadata: Metadata = {
     title: "GenHub — A Home for GenLayer Builders",
     description: "A home for GenLayer builders.",
     type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "GenHub — A Home for GenLayer Builders",
+    description: "A home for GenLayer builders.",
   },
 }
 

@@ -5,6 +5,7 @@ import { motion } from "framer-motion"
 import Link from "next/link"
 import Image from "next/image"
 import { cn } from "@/lib/utils"
+import { MosaicLogo } from "@/components/brand/logo"
 
 const NAV_LINKS = [
   { label: "Features",     href: "#features"    },
@@ -49,19 +50,7 @@ export function LandingNavbar({ user }: { user?: NavUser }) {
         <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-6">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2.5">
-            <div className="grid grid-cols-3 gap-0.5" aria-hidden="true">
-              {[
-                "#fbbf24","#fbbf24","#fbbf24",
-                "#fbbf24","#1a1a2e","#fbbf24",
-                "#4f46e5","#4f46e5","#4f46e5",
-              ].map((c, i) => (
-                <span
-                  key={i}
-                  className="rounded-[2px]"
-                  style={{ width: 8, height: 8, backgroundColor: c }}
-                />
-              ))}
-            </div>
+            <MosaicLogo size="md" />
             <span className="font-ui text-base font-bold text-brand-navy">GenHub</span>
           </Link>
 

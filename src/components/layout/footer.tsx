@@ -1,4 +1,5 @@
 import Link from "next/link"
+import { MosaicLogo } from "@/components/brand/logo"
 
 export function Footer() {
   return (
@@ -6,11 +7,7 @@ export function Footer() {
       <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 sm:flex-row">
         {/* Logo */}
         <div className="flex items-center gap-2.5">
-          <div className="grid grid-cols-3 gap-0.5" aria-hidden="true">
-            {["#fbbf24","#fbbf24","#fbbf24","#fbbf24","#1a1a2e","#fbbf24","#4f46e5","#4f46e5","#4f46e5"].map((c, i) => (
-              <span key={i} className="rounded-[2px]" style={{ width: 7, height: 7, backgroundColor: c }} />
-            ))}
-          </div>
+          <MosaicLogo size="sm" />
           <span className="font-ui text-sm font-semibold text-brand-navy/60">GenHub</span>
         </div>
 

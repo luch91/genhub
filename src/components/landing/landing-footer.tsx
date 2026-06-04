@@ -1,4 +1,5 @@
 import Link from "next/link"
+import { MosaicLogo } from "@/components/brand/logo"
 
 const NAV_COLS = [
   {
@@ -91,15 +92,7 @@ export function LandingFooter() {
         {/* Top: logo + tagline */}
         <div className="mb-12 flex flex-col items-start gap-3">
           <div className="flex items-center gap-2.5">
-            <div className="grid grid-cols-3 gap-0.5" aria-hidden="true">
-              {[
-                "#fbbf24","#fbbf24","#fbbf24",
-                "#fbbf24","#1a1a2e","#fbbf24",
-                "#4f46e5","#4f46e5","#4f46e5",
-              ].map((c, i) => (
-                <span key={i} className="rounded-[2px]" style={{ width: 8, height: 8, backgroundColor: c }} />
-              ))}
-            </div>
+            <MosaicLogo size="md" />
             <span className="font-ui text-base font-bold text-white">GenHub</span>
           </div>
           <p className="font-body text-sm font-light text-brand-indigo-3">

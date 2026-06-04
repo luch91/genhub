@@ -1,6 +1,7 @@
 import type { Metadata } from "next"
 import { redirect } from "next/navigation"
 import { auth, signIn } from "@/lib/auth"
+import { MosaicLogo } from "@/components/brand/logo"
 
 export const metadata: Metadata = { title: "Sign in" }
 
@@ -12,13 +13,8 @@ export default async function LoginPage() {
     <div className="flex min-h-[calc(100vh-4rem)] items-center justify-center px-6 py-12">
       <div className="w-full max-w-sm">
         <div className="mb-8 text-center">
-          {/* Mini mosaic logo */}
           <div className="mb-4 flex justify-center">
-            <div className="grid grid-cols-3 gap-1" aria-hidden="true">
-              {["#fbbf24","#fbbf24","#fbbf24","#fbbf24","#1a1a2e","#fbbf24","#4f46e5","#4f46e5","#4f46e5"].map((c, i) => (
-                <span key={i} className="rounded-[3px]" style={{ width: 14, height: 14, backgroundColor: c }} />
-              ))}
-            </div>
+            <MosaicLogo size="lg" />
           </div>
           <h1 className="font-display text-2xl font-black text-brand-navy">Welcome to GenHub</h1>
           <p className="mt-2 text-sm text-brand-navy/50">

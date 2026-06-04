@@ -4,6 +4,7 @@ import { auth, signOut } from "@/lib/auth"
 import { canReview } from "@/lib/review"
 import { db } from "@/lib/db"
 import { NotificationBell } from "@/components/notifications/notification-bell"
+import { MosaicLogo } from "@/components/brand/logo"
 
 export async function Header() {
   const session = await auth()
@@ -19,11 +20,7 @@ export async function Header() {
       <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-6">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2.5">
-          <div className="grid grid-cols-3 gap-0.5" aria-hidden="true">
-            {["#fbbf24","#fbbf24","#fbbf24","#fbbf24","#1a1a2e","#fbbf24","#4f46e5","#4f46e5","#4f46e5"].map((c, i) => (
-              <span key={i} className="rounded-[2px]" style={{ width: 7, height: 7, backgroundColor: c }} />
-            ))}
-          </div>
+          <MosaicLogo size="sm" />
           <span className="font-ui text-sm font-bold text-brand-navy hidden sm:inline">GenHub</span>
         </Link>
 
