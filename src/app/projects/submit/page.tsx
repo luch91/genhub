@@ -12,8 +12,8 @@ export default async function SubmitProjectPage() {
   return (
     <div className="mx-auto max-w-2xl px-6 py-12">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-white">Submit a project</h1>
-        <p className="mt-2 text-slate-400">
+        <h1 className="font-display text-3xl font-black text-brand-navy">Submit a project</h1>
+        <p className="mt-2 text-brand-navy/55">
           Share what you&apos;ve built on GenLayer with the community.
         </p>
       </div>

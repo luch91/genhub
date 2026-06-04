@@ -47,7 +47,7 @@ export function ReviewForm({ projectId }: Props) {
 
   if (done) {
     return (
-      <p className="text-sm text-emerald-400">
+      <p className="text-sm text-emerald-600">
         Review submitted. Thank you for contributing to the community.
       </p>
     )
@@ -61,8 +61,8 @@ export function ReviewForm({ projectId }: Props) {
           onClick={() => setDecision("APPROVED")}
           className={
             decision === "APPROVED"
-              ? "flex-1 rounded-lg border border-emerald-500 bg-emerald-900/30 py-2.5 text-sm font-medium text-emerald-300"
-              : "flex-1 rounded-lg border border-slate-700 bg-slate-800 py-2.5 text-sm font-medium text-slate-400 hover:border-emerald-700 hover:text-emerald-400"
+              ? "flex-1 rounded-lg border border-emerald-500 bg-emerald-50 py-2.5 text-sm font-medium text-emerald-700"
+              : "flex-1 rounded-lg border border-brand-indigo/15 bg-white py-2.5 text-sm font-medium text-brand-navy/55 hover:border-emerald-400 hover:text-emerald-700 transition-colors"
           }
         >
           Approve
@@ -72,8 +72,8 @@ export function ReviewForm({ projectId }: Props) {
           onClick={() => setDecision("REJECTED")}
           className={
             decision === "REJECTED"
-              ? "flex-1 rounded-lg border border-red-500 bg-red-900/30 py-2.5 text-sm font-medium text-red-300"
-              : "flex-1 rounded-lg border border-slate-700 bg-slate-800 py-2.5 text-sm font-medium text-slate-400 hover:border-red-700 hover:text-red-400"
+              ? "flex-1 rounded-lg border border-red-400 bg-red-50 py-2.5 text-sm font-medium text-red-700"
+              : "flex-1 rounded-lg border border-brand-indigo/15 bg-white py-2.5 text-sm font-medium text-brand-navy/55 hover:border-red-400 hover:text-red-600 transition-colors"
           }
         >
           Reject
@@ -97,7 +97,7 @@ export function ReviewForm({ projectId }: Props) {
 
       {decision === "APPROVED" && (
         <div className="space-y-1.5">
-          <label className="label">Feedback <span className="text-slate-600">(optional)</span></label>
+          <label className="label">Feedback <span className="text-brand-navy/40">(optional)</span></label>
           <textarea
             value={feedback}
             onChange={(e) => setFeedback(e.target.value)}
@@ -108,7 +108,7 @@ export function ReviewForm({ projectId }: Props) {
         </div>
       )}
 
-      {error && <p className="text-sm text-red-400">{error}</p>}
+      {error && <p className="text-sm text-red-600">{error}</p>}
 
       {decision && (
         <button

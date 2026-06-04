@@ -62,7 +62,7 @@ export function NewDiscussionForm() {
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
       {errors.root && (
-        <div className="rounded-lg border border-red-800 bg-red-950/30 px-4 py-3 text-sm text-red-400">
+        <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600">
           {errors.root}
         </div>
       )}
@@ -77,8 +77,8 @@ export function NewDiscussionForm() {
               onClick={() => setCategory(c.value)}
               className={
                 category === c.value
-                  ? "badge bg-violet-600 text-white"
-                  : "badge border border-slate-700 bg-slate-800 text-slate-400 hover:border-slate-600"
+                  ? "badge bg-brand-indigo text-white"
+                  : "badge border border-brand-indigo/15 bg-white text-brand-navy/55 hover:border-brand-indigo/30 hover:text-brand-navy transition-colors"
               }
             >
               {c.label}
@@ -90,7 +90,7 @@ export function NewDiscussionForm() {
       <div className="space-y-1.5">
         <label className="label">Title</label>
         <input name="title" className="input" placeholder="What's on your mind?" />
-        {errors.title && <p className="text-xs text-red-400">{errors.title}</p>}
+        {errors.title && <p className="text-xs text-red-600">{errors.title}</p>}
       </div>
 
       <div className="space-y-1.5">
@@ -101,7 +101,7 @@ export function NewDiscussionForm() {
           rows={6}
           placeholder="Share more context..."
         />
-        {errors.content && <p className="text-xs text-red-400">{errors.content}</p>}
+        {errors.content && <p className="text-xs text-red-600">{errors.content}</p>}
       </div>
 
       <button type="submit" disabled={loading} className="btn-primary w-full py-2.5">

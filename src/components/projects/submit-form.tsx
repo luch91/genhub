@@ -67,7 +67,7 @@ export function SubmitForm() {
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       {errors.root && (
-        <div className="rounded-lg border border-red-800 bg-red-950/30 px-4 py-3 text-sm text-red-400">
+        <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600">
           {errors.root}
         </div>
       )}
@@ -111,8 +111,8 @@ export function SubmitForm() {
               onClick={() => toggleTag(tag)}
               className={
                 selectedTags.includes(tag)
-                  ? "badge bg-violet-600 text-white"
-                  : "badge border border-slate-700 bg-slate-800 text-slate-400 hover:border-slate-600"
+                  ? "badge bg-brand-indigo text-white"
+                  : "badge border border-brand-indigo/15 bg-white text-brand-navy/55 hover:border-brand-indigo/30 hover:text-brand-navy transition-colors"
               }
             >
               {tag}
@@ -121,8 +121,8 @@ export function SubmitForm() {
         </div>
       </Field>
 
-      <div className="border-t border-slate-800 pt-6">
-        <h3 className="mb-4 text-sm font-medium text-slate-400">Optional links</h3>
+      <div className="border-t border-brand-indigo/10 pt-6">
+        <h3 className="mb-4 text-sm font-medium text-brand-navy/45">Optional links</h3>
         <div className="space-y-4">
           <Field label="Contract address" error={errors.contractAddress}>
             <input
@@ -162,10 +162,10 @@ function Field({
     <div className="space-y-1.5">
       <div>
         <label className="label">{label}</label>
-        {hint && <p className="mt-0.5 text-xs text-slate-600">{hint}</p>}
+        {hint && <p className="mt-0.5 text-xs text-brand-navy/40">{hint}</p>}
       </div>
       {children}
-      {error && <p className="text-xs text-red-400">{error}</p>}
+      {error && <p className="text-xs text-red-600">{error}</p>}
     </div>
   )
 }

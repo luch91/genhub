@@ -17,10 +17,10 @@ const CATEGORY_LABELS = {
 } as const
 
 const CATEGORY_COLORS = {
-  GENERAL: "bg-slate-800 text-slate-400",
-  HELP: "bg-blue-900/50 text-blue-300",
-  IDEAS: "bg-amber-900/50 text-amber-300",
-  SHOWCASE: "bg-violet-900/50 text-violet-300",
+  GENERAL:  "border border-brand-indigo/15 bg-brand-indigo/5 text-brand-navy/55",
+  HELP:     "border border-blue-200 bg-blue-50 text-blue-700",
+  IDEAS:    "border border-brand-amber/30 bg-brand-amber/10 text-brand-amber-dk",
+  SHOWCASE: "border border-brand-indigo/25 bg-brand-indigo/10 text-brand-indigo",
 } as const
 
 async function getDiscussion(id: string) {
@@ -53,7 +53,7 @@ export default async function DiscussionPage({ params }: PageProps) {
 
   return (
     <div className="mx-auto max-w-3xl px-6 py-12">
-      <Link href="/discuss" className="mb-6 inline-flex text-sm text-slate-500 hover:text-slate-300">
+      <Link href="/discuss" className="mb-6 inline-flex text-sm text-brand-navy/45 hover:text-brand-navy transition-colors">
         ← Back to discussions
       </Link>
 
@@ -64,10 +64,10 @@ export default async function DiscussionPage({ params }: PageProps) {
             {CATEGORY_LABELS[discussion.category]}
           </span>
         </div>
-        <h1 className="text-2xl font-bold text-white">{discussion.title}</h1>
-        <p className="whitespace-pre-wrap text-slate-300">{discussion.content}</p>
+        <h1 className="font-display text-2xl font-black text-brand-navy">{discussion.title}</h1>
+        <p className="whitespace-pre-wrap text-brand-navy/70">{discussion.content}</p>
 
-        <div className="flex items-center gap-3 border-t border-slate-800 pt-4">
+        <div className="flex items-center gap-3 border-t border-brand-indigo/10 pt-4">
           {discussion.author.image && (
             <Image
               src={discussion.author.image}
@@ -80,11 +80,11 @@ export default async function DiscussionPage({ params }: PageProps) {
           <div className="text-sm">
             <Link
               href={discussion.author.username ? `/builders/${discussion.author.username}` : "#"}
-              className="font-medium text-slate-300 hover:text-white"
+              className="font-medium text-brand-navy hover:text-brand-navy/70 transition-colors"
             >
               {discussion.author.name ?? discussion.author.username}
             </Link>
-            <span className="ml-2 text-slate-600">{formatDate(discussion.createdAt)}</span>
+            <span className="ml-2 text-brand-navy/35">{formatDate(discussion.createdAt)}</span>
           </div>
         </div>
       </div>
@@ -106,21 +106,21 @@ export default async function DiscussionPage({ params }: PageProps) {
                   className="mt-0.5 flex-shrink-0 rounded-full"
                 />
               ) : (
-                <div className="mt-0.5 h-7 w-7 flex-shrink-0 rounded-full bg-slate-700" />
+                <div className="mt-0.5 h-7 w-7 flex-shrink-0 rounded-full bg-brand-indigo/15" />
               )}
-              <div className="flex-1 rounded-xl border border-slate-800 bg-slate-900 p-4">
+              <div className="flex-1 rounded-xl border border-brand-indigo/10 bg-white p-4">
                 <div className="mb-2 flex items-baseline gap-2">
                   <Link
                     href={reply.author.username ? `/builders/${reply.author.username}` : "#"}
-                    className="text-sm font-medium text-slate-300 hover:text-white"
+                    className="text-sm font-medium text-brand-navy hover:text-brand-navy/70 transition-colors"
                   >
                     {reply.author.name ?? reply.author.username}
                   </Link>
-                  <span className="text-xs text-slate-600">
+                  <span className="text-xs text-brand-navy/35">
                     {formatRelativeDate(reply.createdAt)}
                   </span>
                 </div>
-                <p className="whitespace-pre-wrap text-sm text-slate-400">{reply.content}</p>
+                <p className="whitespace-pre-wrap text-sm text-brand-navy/65">{reply.content}</p>
               </div>
             </div>
           ))}

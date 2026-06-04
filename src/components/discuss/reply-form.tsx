@@ -54,8 +54,8 @@ export function ReplyForm({ discussionId, currentUserId, onReply }: Props) {
 
   if (!currentUserId) {
     return (
-      <p className="text-sm text-slate-600">
-        <a href="/login" className="text-violet-400 hover:text-violet-300">Sign in</a> to reply.
+      <p className="text-sm text-brand-navy/45">
+        <a href="/login" className="text-brand-indigo hover:text-brand-indigo/80 transition-colors">Sign in</a> to reply.
       </p>
     )
   }
@@ -77,7 +77,7 @@ export function ReplyForm({ discussionId, currentUserId, onReply }: Props) {
         >
           {submitting ? "..." : "Reply"}
         </button>
-        {error && <p className="text-xs text-red-400">{error}</p>}
+        {error && <p className="text-xs text-red-600">{error}</p>}
       </div>
     </form>
   )

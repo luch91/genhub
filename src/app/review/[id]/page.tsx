@@ -52,7 +52,7 @@ export default async function ReviewProjectPage({ params }: PageProps) {
 
   return (
     <div className="mx-auto max-w-3xl px-6 py-12">
-      <Link href="/review" className="mb-6 inline-flex text-sm text-slate-500 hover:text-slate-300">
+      <Link href="/review" className="mb-6 inline-flex text-sm text-brand-navy/45 hover:text-brand-navy transition-colors">
         ← Back to queue
       </Link>
 
@@ -62,49 +62,49 @@ export default async function ReviewProjectPage({ params }: PageProps) {
           <div>
             <div className="mb-2 flex flex-wrap gap-1">
               {project.tags.map(({ tag }) => (
-                <span key={tag.id} className="badge border border-slate-700 bg-slate-800 text-slate-500 text-xs">
+                <span key={tag.id} className="badge border border-brand-indigo/15 bg-brand-indigo/5 text-brand-indigo/60 text-xs">
                   {tag.name}
                 </span>
               ))}
             </div>
-            <h1 className="text-2xl font-bold text-white">{project.title}</h1>
-            <p className="mt-1 text-slate-400">{project.tagline}</p>
+            <h1 className="font-display text-2xl font-black text-brand-navy">{project.title}</h1>
+            <p className="mt-1 text-brand-navy/55">{project.tagline}</p>
           </div>
 
           <div className="card">
-            <h2 className="mb-2 text-xs font-semibold uppercase tracking-wider text-slate-500">Description</h2>
-            <p className="whitespace-pre-wrap text-sm text-slate-300">{project.description}</p>
+            <h2 className="mb-2 font-mono text-xs font-bold uppercase tracking-wider text-brand-navy/40">Description</h2>
+            <p className="whitespace-pre-wrap text-sm text-brand-navy/70">{project.description}</p>
           </div>
 
-          <div className="rounded-xl border border-violet-500/30 bg-violet-950/20 p-5">
-            <h2 className="mb-2 text-xs font-semibold uppercase tracking-wider text-violet-400">
+          <div className="genlayer-angle">
+            <h2 className="mb-2 font-mono text-xs font-bold uppercase tracking-wider text-brand-indigo">
               Why only GenLayer?
             </h2>
-            <p className="whitespace-pre-wrap text-sm text-slate-300">{project.genlayerAngle}</p>
+            <p className="whitespace-pre-wrap text-sm text-brand-navy/70">{project.genlayerAngle}</p>
           </div>
 
           {(project.contractAddress || project.repoUrl || project.demoUrl) && (
             <div className="card space-y-2 text-sm">
               {project.contractAddress && (
                 <div className="flex justify-between">
-                  <span className="text-slate-500">Contract</span>
-                  <span className="font-mono text-xs text-slate-400">
+                  <span className="text-brand-navy/45">Contract</span>
+                  <span className="font-mono text-xs text-brand-navy/55">
                     {project.contractAddress.slice(0, 10)}…
                   </span>
                 </div>
               )}
               {project.repoUrl && (
                 <div className="flex justify-between">
-                  <span className="text-slate-500">Repo</span>
-                  <a href={project.repoUrl} target="_blank" rel="noopener noreferrer" className="text-violet-400 hover:text-violet-300 text-xs">
+                  <span className="text-brand-navy/45">Repo</span>
+                  <a href={project.repoUrl} target="_blank" rel="noopener noreferrer" className="text-brand-indigo hover:text-brand-indigo/80 text-xs transition-colors">
                     View →
                   </a>
                 </div>
               )}
               {project.demoUrl && (
                 <div className="flex justify-between">
-                  <span className="text-slate-500">Demo</span>
-                  <a href={project.demoUrl} target="_blank" rel="noopener noreferrer" className="text-violet-400 hover:text-violet-300 text-xs">
+                  <span className="text-brand-navy/45">Demo</span>
+                  <a href={project.demoUrl} target="_blank" rel="noopener noreferrer" className="text-brand-indigo hover:text-brand-indigo/80 text-xs transition-colors">
                     Try it →
                   </a>
                 </div>
@@ -117,7 +117,7 @@ export default async function ReviewProjectPage({ params }: PageProps) {
         <aside className="space-y-4">
           {/* Progress */}
           <div className="card">
-            <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-slate-500">
+            <h3 className="mb-3 font-mono text-xs font-bold uppercase tracking-wider text-brand-navy/40">
               Review progress
             </h3>
             <div className="space-y-2">
@@ -138,7 +138,7 @@ export default async function ReviewProjectPage({ params }: PageProps) {
 
           {/* Submitted by */}
           <div className="card">
-            <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-slate-500">
+            <h3 className="mb-3 font-mono text-xs font-bold uppercase tracking-wider text-brand-navy/40">
               Submitted by
             </h3>
             <div className="flex items-center gap-2">
@@ -152,8 +152,8 @@ export default async function ReviewProjectPage({ params }: PageProps) {
                 />
               )}
               <div>
-                <p className="text-sm font-medium text-slate-200">{project.author.name}</p>
-                <p className="text-xs text-slate-600">{formatDate(project.createdAt)}</p>
+                <p className="text-sm font-medium text-brand-navy">{project.author.name}</p>
+                <p className="text-xs text-brand-navy/35">{formatDate(project.createdAt)}</p>
               </div>
             </div>
           </div>
@@ -161,7 +161,7 @@ export default async function ReviewProjectPage({ params }: PageProps) {
           {/* Existing feedback */}
           {project.reviews.some((r) => r.feedback) && (
             <div className="card space-y-3">
-              <h3 className="text-xs font-semibold uppercase tracking-wider text-slate-500">
+              <h3 className="font-mono text-xs font-bold uppercase tracking-wider text-brand-navy/40">
                 Reviewer feedback
               </h3>
               {project.reviews
@@ -172,17 +172,17 @@ export default async function ReviewProjectPage({ params }: PageProps) {
                       <span
                         className={
                           r.decision === "APPROVED"
-                            ? "text-emerald-400"
-                            : "text-red-400"
+                            ? "text-emerald-600"
+                            : "text-red-500"
                         }
                       >
                         {r.decision === "APPROVED" ? "✓" : "✗"}
                       </span>
-                      <span className="text-slate-500">
+                      <span className="text-brand-navy/45">
                         {r.reviewer.name ?? r.reviewer.username}
                       </span>
                     </div>
-                    <p className="text-xs text-slate-500">{r.feedback}</p>
+                    <p className="text-xs text-brand-navy/45">{r.feedback}</p>
                   </div>
                 ))}
             </div>
@@ -190,11 +190,11 @@ export default async function ReviewProjectPage({ params }: PageProps) {
 
           {/* Review form */}
           <div className="card">
-            <h3 className="mb-4 text-xs font-semibold uppercase tracking-wider text-slate-500">
+            <h3 className="mb-4 font-mono text-xs font-bold uppercase tracking-wider text-brand-navy/40">
               Your review
             </h3>
             {alreadyReviewed ? (
-              <p className="text-sm text-slate-500">You have already reviewed this project.</p>
+              <p className="text-sm text-brand-navy/45">You have already reviewed this project.</p>
             ) : (
               <ReviewForm projectId={project.id} />
             )}
@@ -220,12 +220,12 @@ function ReviewBar({
   return (
     <div>
       <div className="mb-1 flex justify-between text-xs">
-        <span className="text-slate-500">{label}</span>
-        <span className={color === "emerald" ? "text-emerald-500" : "text-red-500"}>
+        <span className="text-brand-navy/45">{label}</span>
+        <span className={color === "emerald" ? "text-emerald-600" : "text-red-500"}>
           {count}/{needed}
         </span>
       </div>
-      <div className="h-1.5 w-full rounded-full bg-slate-800">
+      <div className="h-1.5 w-full rounded-full bg-brand-navy/10">
         <div
           className={`h-1.5 rounded-full transition-all ${
             color === "emerald" ? "bg-emerald-500" : "bg-red-500"
