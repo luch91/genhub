@@ -2,11 +2,9 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import { useSession } from "next-auth/react"
 
 export function OnboardingForm() {
   const router = useRouter()
-  const { update } = useSession()
   const [username, setUsername] = useState("")
   const [bio, setBio] = useState("")
   const [error, setError] = useState("")
@@ -30,8 +28,6 @@ export function OnboardingForm() {
       return
     }
 
-    // Refresh the JWT token so middleware sees the new username immediately
-    await update({ username })
     router.push("/projects")
     router.refresh()
   }

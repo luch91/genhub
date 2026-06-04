@@ -1,5 +1,7 @@
 import type { Metadata } from "next"
+import { redirect } from "next/navigation"
 import Link from "next/link"
+import { auth } from "@/lib/auth"
 import { db } from "@/lib/db"
 import { ProjectCard } from "@/components/projects/project-card"
 import { PREDEFINED_TAGS } from "@/lib/utils"
@@ -33,6 +35,9 @@ async function getProjects(tag?: string, sort?: string) {
 }
 
 export default async function ProjectsPage({ searchParams }: PageProps) {
+  const session = await auth()
+  if (session?.user && !session.user.username) redirect("/onboarding")
+
   const { tag, sort } = await searchParams
   const projects = await getProjects(tag, sort)
 
