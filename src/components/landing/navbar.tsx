@@ -11,7 +11,7 @@ const NAV_LINKS = [
   { label: "Features",     href: "#features"    },
   { label: "How It Works", href: "#how-it-works" },
   { label: "Community",    href: "#community"   },
-  { label: "Pricing",      href: "#pricing"     },
+  { label: "FAQ",           href: "#faq"         },
 ]
 
 type NavUser = { name?: string | null; image?: string | null; email?: string | null } | null

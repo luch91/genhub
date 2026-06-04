@@ -5,7 +5,7 @@ import { ProofStrip }          from "@/components/landing/proof-strip"
 import { FeaturesSection }     from "@/components/landing/features-section"
 import { HowItWorksSection }   from "@/components/landing/how-it-works"
 import { ShowcaseSection }     from "@/components/landing/showcase-section"
-import { PricingSection }      from "@/components/landing/pricing-section"
+import { FaqSection }          from "@/components/landing/faq-section"
 import { CTABanner }           from "@/components/landing/cta-banner"
 import { LandingFooter }       from "@/components/landing/landing-footer"
 
@@ -24,7 +24,7 @@ export default async function HomePage() {
         <FeaturesSection />
         <HowItWorksSection />
         <ShowcaseSection />
-        <PricingSection />
+        <FaqSection />
         <CTABanner />
       </main>
       <LandingFooter />
