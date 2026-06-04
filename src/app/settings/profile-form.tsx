@@ -39,43 +39,48 @@ export function ProfileForm({ defaultValues }: Props) {
     // Capture form ref before any awaits — synthetic event is nullified after async gaps
     const form = e.currentTarget
 
-    if (avatarFile) {
-      const fd = new FormData()
-      fd.append("file", avatarFile)
-      const avatarRes = await fetch("/api/user/avatar", { method: "POST", body: fd })
-      if (!avatarRes.ok) {
-        const json = await avatarRes.json()
-        setError(json.error ?? "Failed to upload photo")
+    try {
+      if (avatarFile) {
+        const fd = new FormData()
+        fd.append("file", avatarFile)
+        const avatarRes = await fetch("/api/user/avatar", { method: "POST", body: fd })
+        if (!avatarRes.ok) {
+          const json = await avatarRes.json()
+          setError(json.error ?? "Failed to upload photo")
+          setLoading(false)
+          return
+        }
+      }
+
+      const body = {
+        name:          (form.elements.namedItem("name")          as HTMLInputElement).value.trim(),
+        username:      (form.elements.namedItem("username")      as HTMLInputElement).value.trim(),
+        bio:           (form.elements.namedItem("bio")           as HTMLTextAreaElement).value.trim(),
+        twitterHandle: (form.elements.namedItem("twitterHandle") as HTMLInputElement).value.trim(),
+        githubHandle:  (form.elements.namedItem("githubHandle")  as HTMLInputElement).value.trim(),
+        website:       (form.elements.namedItem("website")       as HTMLInputElement).value.trim(),
+        walletAddress: (form.elements.namedItem("walletAddress") as HTMLInputElement).value.trim(),
+      }
+
+      const res = await fetch("/api/user", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      })
+
+      const json = await res.json()
+      if (!res.ok) {
+        setError(typeof json.error === "string" ? json.error : "Please check the form and try again.")
         setLoading(false)
         return
       }
-    }
 
-    const body = {
-      name:          (form.elements.namedItem("name")          as HTMLInputElement).value.trim(),
-      username:      (form.elements.namedItem("username")      as HTMLInputElement).value.trim(),
-      bio:           (form.elements.namedItem("bio")           as HTMLTextAreaElement).value.trim(),
-      twitterHandle: (form.elements.namedItem("twitterHandle") as HTMLInputElement).value.trim(),
-      githubHandle:  (form.elements.namedItem("githubHandle")  as HTMLInputElement).value.trim(),
-      website:       (form.elements.namedItem("website")       as HTMLInputElement).value.trim(),
-      walletAddress: (form.elements.namedItem("walletAddress") as HTMLInputElement).value.trim(),
-    }
-
-    const res = await fetch("/api/user", {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body),
-    })
-
-    const json = await res.json()
-    if (!res.ok) {
-      setError(typeof json.error === "string" ? json.error : "Please check the form and try again.")
+      router.refresh()
+      router.push(`/builders/${json.username}`)
+    } catch {
+      setError("Something went wrong. Please try again.")
       setLoading(false)
-      return
     }
-
-    router.refresh()
-    router.push(`/builders/${json.username}`)
   }
 
   const avatarSrc = previewUrl ?? defaultValues.image
