@@ -74,8 +74,8 @@ export function ProfileForm({ defaultValues }: Props) {
       return
     }
 
-    router.push(`/builders/${json.username}`)
     router.refresh()
+    router.push(`/builders/${json.username}`)
   }
 
   const avatarSrc = previewUrl ?? defaultValues.image
