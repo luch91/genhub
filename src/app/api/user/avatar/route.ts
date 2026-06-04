@@ -29,6 +29,7 @@ export async function POST(request: NextRequest) {
     const blob = await put(`avatars/${session.user.id}`, file, {
       access: "public",
       addRandomSuffix: false,
+      allowOverwrite: true,
     })
 
     await db.user.update({
