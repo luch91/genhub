@@ -103,6 +103,10 @@ model Project {
   createdAt     DateTime      @default(now())
   updatedAt     DateTime      @updatedAt
 
+  remixedFromId  String?
+  remixedFrom    Project?  @relation("ProjectRemix", fields: [remixedFromId], references: [id], onDelete: SetNull)
+  remixes        Project[] @relation("ProjectRemix")
+
   authorId String
   author   User   @relation(fields: [authorId], references: [id], onDelete: Cascade)
 

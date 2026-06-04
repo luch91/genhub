@@ -6,6 +6,9 @@ import { db } from "@/lib/db"
 import { auth } from "@/lib/auth"
 import { formatDate, UPDATE_TYPE_LABELS, UPDATE_TYPE_COLORS } from "@/lib/utils"
 import { CommentSection } from "@/components/comments/comment-section"
+import { UpvoteButton } from "@/components/projects/upvote-button"
+import { VerifyButton } from "@/components/projects/verify-button"
+import { RemixButton } from "@/components/projects/remix-button"
 
 type PageProps = { params: Promise<{ slug: string }> }
 
@@ -28,6 +31,7 @@ async function getProject(slug: string, userId?: string) {
       },
       _count:   { select: { upvotes: true, comments: true, updates: true } },
       reviews:  { select: { decision: true, feedback: true } },
+      remixedFrom: { select: { id: true, title: true, slug: true } },
     },
   })
 
@@ -56,8 +60,30 @@ export default async function ProjectPage({ params }: PageProps) {
   const rejections        = project.reviews.filter((r) => r.decision === "REJECTED").length
   const rejectionFeedback = project.reviews.filter((r) => r.decision === "REJECTED" && r.feedback).map((r) => r.feedback)
 
+  const hasUpvoted = session?.user
+    ? await db.upvote.findUnique({
+        where: { userId_projectId: { userId: session.user.id, projectId: project.id } },
+      }).then(Boolean)
+    : false
+
   return (
     <div className="mx-auto max-w-4xl px-6 py-12">
+      {/* Remixed-from attribution */}
+      {project.remixedFrom && (
+        <div className="mb-6 rounded-xl border border-brand-amber/25 bg-brand-amber/8 px-5 py-3">
+          <p className="font-mono text-xs font-bold uppercase tracking-wider text-brand-amber-dk">Remix</p>
+          <p className="mt-0.5 text-sm text-brand-navy/65">
+            Based on{" "}
+            <Link
+              href={`/projects/${project.remixedFrom.slug}`}
+              className="font-semibold text-brand-navy hover:text-brand-indigo transition-colors"
+            >
+              {project.remixedFrom.title}
+            </Link>
+          </p>
+        </div>
+      )}
+
       {/* Status banners */}
       {project.status === "PENDING_REVIEW" && (
         <div className="mb-6 rounded-xl border border-brand-amber/30 bg-brand-amber/8 px-5 py-4">
@@ -155,14 +181,37 @@ export default async function ProjectPage({ params }: PageProps) {
 
         {/* Sidebar */}
         <aside className="space-y-4">
-          {/* Stats */}
+          {/* Upvote + stats */}
           <div className="card">
-            <div className="grid grid-cols-3 gap-4 text-center">
-              <SidebarStat value={project._count.upvotes}  label="Upvotes" />
-              <SidebarStat value={project._count.updates}  label="Updates" />
-              <SidebarStat value={project._count.comments} label="Comments" />
+            <div className="flex items-center gap-4">
+              <UpvoteButton
+                projectId={project.id}
+                initialCount={project._count.upvotes}
+                initialUpvoted={hasUpvoted}
+                currentUserId={session?.user?.id}
+              />
+              <div className="flex flex-1 flex-col gap-3">
+                <SidebarStat value={project._count.updates}  label="Updates" />
+                <SidebarStat value={project._count.comments} label="Comments" />
+              </div>
             </div>
           </div>
+
+          {/* Actions */}
+          {project.status === "PUBLISHED" && (
+            <div className="space-y-2">
+              <RemixButton
+                slug={project.slug}
+                currentUserId={session?.user?.id}
+                authorId={project.authorId}
+              />
+              {session?.user?.id === project.authorId &&
+                project.contractAddress &&
+                !project.verified && (
+                  <VerifyButton projectId={project.id} />
+                )}
+            </div>
+          )}
 
           {/* Author */}
           <div className="card">
