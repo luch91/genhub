@@ -5,6 +5,7 @@ import { canReview } from "@/lib/review"
 import { db } from "@/lib/db"
 import { NotificationBell } from "@/components/notifications/notification-bell"
 import { MosaicLogo } from "@/components/brand/logo"
+import { MobileNav } from "@/components/layout/mobile-nav"
 
 export async function Header() {
   const session = await auth()
@@ -16,7 +17,7 @@ export async function Header() {
   ])
 
   return (
-    <header className="sticky top-0 z-50 border-b border-brand-indigo/10 bg-brand-cream/95 backdrop-blur">
+    <header className="sticky top-0 z-50 border-b border-brand-indigo/10 bg-brand-cream/95 backdrop-blur relative">
       <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-6">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2.5">
@@ -24,8 +25,8 @@ export async function Header() {
           <span className="font-ui text-sm font-bold text-brand-navy hidden sm:inline">GenHub</span>
         </Link>
 
-        {/* Nav */}
-        <nav className="flex items-center gap-1">
+        {/* Nav — hidden on mobile, visible on desktop */}
+        <nav className="hidden md:flex items-center gap-1">
           <Link href="/projects"  className="btn-ghost py-1.5 text-sm">Projects</Link>
           <Link href="/builders"  className="btn-ghost py-1.5 text-sm">Builders</Link>
           <Link href="/feed"      className="btn-ghost py-1.5 text-sm">Feed</Link>
@@ -54,6 +55,7 @@ export async function Header() {
               Sign in
             </Link>
           )}
+          <MobileNav eligible={eligible} />
         </div>
       </div>
     </header>
