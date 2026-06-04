@@ -6,7 +6,7 @@ import Link from "next/link"
 import { ParallaxBackground } from "./parallax-background"
 import { useSound } from "@/hooks/use-sound"
 
-const HEADLINE = "The Quality-Gated Home for GenLayer Builders"
+const HEADLINE = "The Open-Access Home for GenLayer Builders"
 
 const charVariants = {
   hidden: { opacity: 0, y: "110%" },
@@ -72,7 +72,7 @@ export function Hero() {
           className="mb-8 inline-flex items-center gap-2 rounded-full border border-[#00F0FF]/20 bg-[#00F0FF]/5 px-4 py-1.5 text-sm text-[#00F0FF]"
         >
           <span className="h-2 w-2 animate-pulse rounded-full bg-[#00F0FF]" />
-          Quality-Gated · Builder-Centric · On-Chain
+          Open Access · Builder-Centric · On-Chain
         </motion.div>
 
         {/* Headline — character-by-character stagger */}

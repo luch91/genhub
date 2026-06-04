@@ -138,7 +138,7 @@ export function HeroSection() {
               variants={stagger.item}
               className="mt-8 font-mono text-xs tracking-wide text-brand-navy/40"
             >
-              Quality-Gated · Builder-Centric · On-Chain
+              Open Access · Builder-Centric · On-Chain
             </motion.p>
           </motion.div>
 
