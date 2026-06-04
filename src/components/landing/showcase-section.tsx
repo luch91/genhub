@@ -1,4 +1,3 @@
-import { motion } from "framer-motion"
 import { db } from "@/lib/db"
 import { ShowcaseGrid, type ShowcaseCard } from "./showcase-grid"
 
@@ -124,27 +123,6 @@ export async function ShowcaseSection() {
       />
 
       <div className="relative mx-auto max-w-5xl">
-        {/* Header */}
-        <motion.div
-          className="mb-14 text-center"
-          initial={{ opacity: 0, y: 24 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-        >
-          <span className="font-mono text-[11px] font-bold uppercase tracking-[0.18em] text-brand-indigo/50">
-            Who&apos;s Building
-          </span>
-          <h2 className="mt-3 font-display text-4xl font-black text-brand-navy md:text-5xl">
-            Meet the GenLayer
-            <br />
-            Builder Community
-          </h2>
-          <p className="mx-auto mt-4 max-w-lg font-body text-base text-brand-navy/55">
-            Real builders. All building in public.
-          </p>
-        </motion.div>
-
         <ShowcaseGrid cards={cards} />
       </div>
     </section>
