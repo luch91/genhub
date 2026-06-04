@@ -5,6 +5,20 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
+const COVER_GRADIENTS = [
+  "linear-gradient(135deg, #4f46e518 0%, #818cf832 100%)",  // indigo soft
+  "linear-gradient(135deg, #fbbf2418 0%, #f59e0b2a 100%)",  // amber soft
+  "linear-gradient(135deg, #1a1a2e12 0%, #4f46e524 100%)",  // navy → indigo
+  "linear-gradient(135deg, #4f46e514 0%, #fbbf2422 100%)",  // indigo → amber
+  "linear-gradient(135deg, #a5b4fc22 0%, #4f46e532 100%)",  // indigo-3
+  "linear-gradient(135deg, #fde68a18 0%, #fbbf2428 100%)",  // amber-lt
+]
+
+export function projectCoverGradient(id: string): string {
+  const hash = Array.from(id).reduce((sum, ch) => sum + ch.charCodeAt(0), 0)
+  return COVER_GRADIENTS[hash % COVER_GRADIENTS.length]
+}
+
 export function slugify(str: string): string {
   return str
     .toLowerCase()

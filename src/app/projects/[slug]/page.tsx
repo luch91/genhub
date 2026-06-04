@@ -4,7 +4,7 @@ import Image from "next/image"
 import Link from "next/link"
 import { db } from "@/lib/db"
 import { auth } from "@/lib/auth"
-import { formatDate, UPDATE_TYPE_LABELS, UPDATE_TYPE_COLORS } from "@/lib/utils"
+import { formatDate, UPDATE_TYPE_LABELS, UPDATE_TYPE_COLORS, projectCoverGradient } from "@/lib/utils"
 import { CommentSection } from "@/components/comments/comment-section"
 import { UpvoteButton } from "@/components/projects/upvote-button"
 import { VerifyButton } from "@/components/projects/verify-button"
@@ -166,12 +166,14 @@ export default async function ProjectPage({ params }: PageProps) {
             <p className="mt-2 text-lg text-brand-navy/55">{project.tagline}</p>
           </div>
 
-          {/* Cover image */}
-          {project.coverImage && (
-            <div className="overflow-hidden rounded-xl border border-brand-indigo/10">
+          {/* Cover image / placeholder */}
+          <div className="overflow-hidden rounded-xl border border-brand-indigo/10">
+            {project.coverImage ? (
               <Image src={project.coverImage} alt={project.title} width={800} height={400} className="w-full object-cover" />
-            </div>
-          )}
+            ) : (
+              <div className="h-52 w-full" style={{ background: projectCoverGradient(project.id) }} />
+            )}
+          </div>
 
           {/* Description */}
           <div className="card">

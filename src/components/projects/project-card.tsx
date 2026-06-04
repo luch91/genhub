@@ -1,7 +1,7 @@
 import Link from "next/link"
 import Image from "next/image"
 import type { ProjectWithRelations } from "@/types"
-import { formatRelativeDate } from "@/lib/utils"
+import { formatRelativeDate, projectCoverGradient } from "@/lib/utils"
 
 type Props = { project: ProjectWithRelations }
 
@@ -11,9 +11,9 @@ export function ProjectCard({ project }: Props) {
       href={`/projects/${project.slug}`}
       className="card group flex flex-col gap-4 transition-all hover:border-brand-indigo/25 hover:shadow-md"
     >
-      {/* Cover image */}
-      {project.coverImage && (
-        <div className="-mx-6 -mt-6 overflow-hidden rounded-t-xl">
+      {/* Cover image / placeholder */}
+      <div className="-mx-6 -mt-6 overflow-hidden rounded-t-xl">
+        {project.coverImage ? (
           <Image
             src={project.coverImage}
             alt={project.title}
@@ -21,8 +21,13 @@ export function ProjectCard({ project }: Props) {
             height={200}
             className="h-36 w-full object-cover transition-transform duration-300 group-hover:scale-105"
           />
-        </div>
-      )}
+        ) : (
+          <div
+            className="h-36 w-full"
+            style={{ background: projectCoverGradient(project.id) }}
+          />
+        )}
+      </div>
 
       {/* Tags */}
       <div className="flex flex-wrap gap-1">
