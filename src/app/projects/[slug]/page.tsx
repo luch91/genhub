@@ -9,6 +9,7 @@ import { CommentSection } from "@/components/comments/comment-section"
 import { UpvoteButton } from "@/components/projects/upvote-button"
 import { VerifyButton } from "@/components/projects/verify-button"
 import { RemixButton } from "@/components/projects/remix-button"
+import { ResubmitButton } from "@/components/projects/resubmit-button"
 
 type PageProps = { params: Promise<{ slug: string }> }
 
@@ -39,6 +40,7 @@ async function getProject(slug: string, userId?: string) {
   if (project.status === "PUBLISHED") return project
   if (project.status === "PENDING_REVIEW" && project.authorId === userId) return project
   if (project.status === "DRAFT"          && project.authorId === userId) return project
+  if (project.status === "EXPIRED"        && project.authorId === userId) return project
   return null
 }
 
@@ -85,6 +87,15 @@ export default async function ProjectPage({ params }: PageProps) {
       )}
 
       {/* Status banners */}
+      {project.status === "EXPIRED" && session?.user?.id === project.authorId && (
+        <div className="mb-6 rounded-xl border border-red-200 bg-red-50 px-5 py-4">
+          <p className="font-ui font-semibold text-red-700">Removed from gallery</p>
+          <p className="mt-1 text-sm text-red-600">
+            This project didn&apos;t reach 5 upvotes within 2 weeks of publishing. Resubmit to give it another chance — the 2-week clock resets.
+          </p>
+          <ResubmitButton projectId={project.id} />
+        </div>
+      )}
       {project.status === "PENDING_REVIEW" && (
         <div className="mb-6 rounded-xl border border-brand-amber/30 bg-brand-amber/8 px-5 py-4">
           <p className="font-ui font-semibold text-brand-amber-dk">Under review</p>

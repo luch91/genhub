@@ -6,6 +6,7 @@ const EMAIL_TYPES = new Set<NotificationType>([
   "COMMENT",
   "PROJECT_PUBLISHED",
   "PROJECT_REJECTED",
+  "PROJECT_EXPIRED",
   "FOLLOW",
   "DISCUSSION_REPLY",
 ])

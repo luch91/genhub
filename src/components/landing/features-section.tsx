@@ -43,8 +43,8 @@ const FEATURES = [
     iconIdx: 3,
   },
   {
-    title: "Peer Review Requests",
-    body:  "3 community approvals to go live. Rejection feedback tells you exactly what to improve.",
+    title: "Community Curation",
+    body:  "Projects go live instantly. Earn 5 upvotes in 2 weeks to stay in the gallery — or resubmit and try again.",
     size:  "small",
     iconIdx: 4,
   },

@@ -21,8 +21,8 @@ const FAQS = [
     a: "Yes, completely. GenHub is a community platform — no subscriptions, no paid tiers, no credit card required. Every builder gets full access to submit projects, post updates, join discussions, and connect with the community.",
   },
   {
-    q: "How does the project review process work?",
-    a: "When you submit a project it enters a peer review queue. Three community members with at least one published project each review it. Three approvals publishes it to the gallery; three rejections returns it with feedback so you can revise and resubmit.",
+    q: "How does the project curation work?",
+    a: "Projects go live instantly when you submit. They need to earn 5 community upvotes within 2 weeks to stay in the gallery. If yours doesn't make the cut, you'll be notified and can resubmit — the 2-week clock resets each time.",
   },
   {
     q: "Can I submit a work-in-progress?",

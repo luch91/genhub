@@ -87,7 +87,8 @@ export async function POST(request: NextRequest) {
       repoUrl: repoUrl || null,
       demoUrl: demoUrl || null,
       remixedFromId,
-      status: "PENDING_REVIEW",
+      status: "PUBLISHED",
+      publishedAt: new Date(),
       authorId: session.user.id,
       tags: {
         create: await Promise.all(
