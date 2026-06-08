@@ -3,7 +3,7 @@ import { auth } from "@/lib/auth"
 import { db } from "@/lib/db"
 import { projectSubmitSchema } from "@/lib/validations"
 import { slugify, generateSlugSuffix } from "@/lib/utils"
-import { notifyFollowers } from "@/lib/notifications"
+import { notifyAllBuilders } from "@/lib/notifications"
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url)
@@ -119,10 +119,10 @@ export async function POST(request: NextRequest) {
       where: { id: session.user.id },
       data: { submissionCredits: { decrement: 1 } },
     }),
-    notifyFollowers(
+    notifyAllBuilders(
       session.user.id,
       "NEW_PROJECT",
-      `${actorName} submitted a new project: "${project.title}"`,
+      `${actorName} just published a new project: "${project.title}"`,
       `/projects/${project.slug}`
     ),
   ])

@@ -2,6 +2,9 @@ import { NextRequest } from "next/server"
 import { auth } from "@/lib/auth"
 import { db } from "@/lib/db"
 import { REVIEW_THRESHOLDS } from "@/lib/utils"
+import { notifyUser } from "@/lib/notifications"
+
+const UPVOTE_MILESTONES = new Set([5, 10, 25])
 
 type Params = { params: Promise<{ id: string }> }
 
@@ -25,6 +28,15 @@ export async function POST(_: NextRequest, { params }: Params) {
 
   await db.upvote.create({ data: { userId: session.user.id, projectId: id } })
   const count = await db.upvote.count({ where: { projectId: id } })
+
+  if (UPVOTE_MILESTONES.has(count) && project.authorId !== session.user.id) {
+    await notifyUser(
+      project.authorId,
+      "UPVOTE_MILESTONE",
+      `Your project "${project.title}" just hit ${count} upvote${count === 1 ? "" : "s"}! 🎉`,
+      `/projects/${project.slug}`
+    )
+  }
 
   // Restore one submission credit to the author when their project hits the threshold (once only)
   if (

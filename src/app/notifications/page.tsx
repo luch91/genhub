@@ -8,14 +8,16 @@ import { formatRelativeDate } from "@/lib/utils"
 export const metadata: Metadata = { title: "Notifications" }
 
 const TYPE_ICONS: Record<string, string> = {
-  FOLLOW:           "👤",
-  PROJECT_REVIEW:   "👀",
-  PROJECT_PUBLISHED:"✅",
-  PROJECT_REJECTED: "↩️",
-  NEW_UPDATE:       "📝",
-  NEW_PROJECT:      "🚀",
-  COMMENT:          "💬",
-  DISCUSSION_REPLY: "↩",
+  FOLLOW:            "👤",
+  PROJECT_REVIEW:    "👀",
+  PROJECT_PUBLISHED: "✅",
+  PROJECT_REJECTED:  "↩️",
+  NEW_UPDATE:        "📝",
+  NEW_PROJECT:       "🚀",
+  COMMENT:           "💬",
+  DISCUSSION_REPLY:  "↩",
+  SPACE_LIVE:        "🎙",
+  UPVOTE_MILESTONE:  "⬆️",
 }
 
 export default async function NotificationsPage() {

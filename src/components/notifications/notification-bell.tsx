@@ -14,14 +14,16 @@ type Notification = {
 }
 
 const TYPE_ICONS: Record<string, string> = {
-  FOLLOW:           "👤",
-  PROJECT_REVIEW:   "👀",
-  PROJECT_PUBLISHED:"✅",
-  PROJECT_REJECTED: "↩️",
-  NEW_UPDATE:       "📝",
-  NEW_PROJECT:      "🚀",
-  COMMENT:          "💬",
-  DISCUSSION_REPLY: "↩",
+  FOLLOW:            "👤",
+  PROJECT_REVIEW:    "👀",
+  PROJECT_PUBLISHED: "✅",
+  PROJECT_REJECTED:  "↩️",
+  NEW_UPDATE:        "📝",
+  NEW_PROJECT:       "🚀",
+  COMMENT:           "💬",
+  DISCUSSION_REPLY:  "↩",
+  SPACE_LIVE:        "🎙",
+  UPVOTE_MILESTONE:  "⬆️",
 }
 
 type Props = { initialCount: number }

@@ -13,6 +13,14 @@ import "@livekit/components-styles"
 import { ConnectionState, type ReconnectContext } from "livekit-client"
 import { cn } from "@/lib/utils"
 
+type DbParticipant = {
+  userId:    string
+  name:      string | null
+  username:  string | null
+  role:      string
+  handRaised: boolean
+}
+
 // ── Participant tile ──────────────────────────────────────────────────────────
 
 function ParticipantTile({
@@ -79,7 +87,7 @@ function SpaceRoomInner({
   spaceId,
   hostId,
   currentUserId,
-  role,
+  role: initialRole,
   xSpaceUrl,
   onEnd,
 }: {
@@ -95,9 +103,12 @@ function SpaceRoomInner({
   const room                                      = useRoomContext()
   const [handRaised, setHandRaised]               = useState(false)
   const [connectionState, setConnectionState]     = useState<ConnectionState>(ConnectionState.Connecting)
+  const [myRole, setMyRole]                       = useState(initialRole)
+  const [dbParticipants, setDbParticipants]       = useState<DbParticipant[]>([])
+  const [endConfirming, setEndConfirming]         = useState(false)
 
   const isHost     = currentUserId === hostId
-  const canPublish = isHost || role === "SPEAKER"
+  const canPublish = isHost || myRole === "SPEAKER"
 
   useEffect(() => {
     if (!room) return
@@ -105,6 +116,34 @@ function SpaceRoomInner({
     room.on("connectionStateChanged", handler)
     return () => { room.off("connectionStateChanged", handler) }
   }, [room])
+
+  // Host: poll DB participants every 5s to see raised hands
+  useEffect(() => {
+    if (!isHost) return
+    const poll = async () => {
+      const res = await fetch(`/api/spaces/${spaceId}/participants`)
+      if (res.ok) setDbParticipants(await res.json())
+    }
+    poll()
+    const timer = setInterval(poll, 5000)
+    return () => clearInterval(timer)
+  }, [isHost, spaceId])
+
+  // Listener: poll own role every 5s to detect admission
+  useEffect(() => {
+    if (isHost) return
+    const poll = async () => {
+      const res = await fetch(`/api/spaces/${spaceId}/my-role`)
+      if (!res.ok) return
+      const data = await res.json()
+      if (data.role && data.role !== myRole) {
+        setMyRole(data.role)
+        if (data.role === "SPEAKER") setHandRaised(false)
+      }
+    }
+    const timer = setInterval(poll, 5000)
+    return () => clearInterval(timer)
+  }, [isHost, spaceId, myRole])
 
   const toggleMic = useCallback(() => {
     localParticipant.setMicrophoneEnabled(!isMicrophoneEnabled)
@@ -115,16 +154,38 @@ function SpaceRoomInner({
     setHandRaised((prev) => !prev)
   }, [spaceId])
 
+  const admitSpeaker = useCallback(async (userId: string) => {
+    await fetch(`/api/spaces/${spaceId}/admit`, {
+      method:  "POST",
+      headers: { "Content-Type": "application/json" },
+      body:    JSON.stringify({ userId }),
+    })
+    setDbParticipants((prev) =>
+      prev.map((p) => p.userId === userId ? { ...p, role: "SPEAKER", handRaised: false } : p)
+    )
+  }, [spaceId])
+
+  const removeSpeaker = useCallback(async (userId: string) => {
+    await fetch(`/api/spaces/${spaceId}/remove-speaker`, {
+      method:  "POST",
+      headers: { "Content-Type": "application/json" },
+      body:    JSON.stringify({ userId }),
+    })
+    setDbParticipants((prev) =>
+      prev.map((p) => p.userId === userId ? { ...p, role: "LISTENER" } : p)
+    )
+  }, [spaceId])
+
   const endSpace = useCallback(async () => {
-    const replayUrl = window.prompt("Paste a YouTube replay URL (optional):")
     await fetch(`/api/spaces/${spaceId}/end`, {
       method:  "POST",
       headers: { "Content-Type": "application/json" },
-      body:    JSON.stringify({ replayUrl: replayUrl ?? "" }),
+      body:    JSON.stringify({ replayUrl: "" }),
     })
     onEnd()
   }, [spaceId, onEnd])
 
+  const raisedHands   = dbParticipants.filter((p) => p.handRaised && p.role !== "HOST")
   const speakers      = participants.filter((p) => p.permissions?.canPublish)
   const listenerCount = participants.filter((p) => !p.permissions?.canPublish).length
 
@@ -133,6 +194,7 @@ function SpaceRoomInner({
       <RoomAudioRenderer />
       <ConnectionBanner state={connectionState} />
 
+      {/* Live indicator */}
       <div className="flex items-center gap-4 text-sm">
         <span className="flex items-center gap-1.5">
           <span className="w-2 h-2 rounded-full bg-brand-indigo animate-pulse" />
@@ -141,22 +203,64 @@ function SpaceRoomInner({
         <span className="text-brand-navy/40 text-xs font-mono">{listenerCount} listening</span>
       </div>
 
+      {/* Host: raised hands panel */}
+      {isHost && raisedHands.length > 0 && (
+        <div className="rounded-xl border border-brand-amber/30 bg-brand-amber/5 p-4">
+          <p className="text-xs font-mono text-brand-amber uppercase tracking-widest mb-3">
+            ✋ Raised Hands ({raisedHands.length})
+          </p>
+          <div className="flex flex-col gap-2">
+            {raisedHands.map((p) => (
+              <div key={p.userId} className="flex items-center justify-between">
+                <span className="text-sm font-medium text-brand-navy">
+                  {p.name ?? p.username ?? "Builder"}
+                </span>
+                <button
+                  onClick={() => admitSpeaker(p.userId)}
+                  className="px-3 py-1 rounded-full bg-brand-indigo hover:bg-brand-indigo/85 text-white text-xs font-semibold transition-colors"
+                >
+                  Admit
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Speakers grid */}
       <div>
         <p className="text-xs font-mono text-brand-navy/40 uppercase tracking-widest mb-4">Speakers</p>
         <div className="flex flex-wrap gap-8">
           {speakers.map((p) => (
-            <ParticipantTile
-              key={p.identity}
-              identity={p.identity}
-              name={p.name}
-              role={p.identity === hostId ? "HOST" : "SPEAKER"}
-              isSpeaking={p.isSpeaking}
-              isCurrentUser={p.identity === currentUserId}
-            />
+            <div key={p.identity} className="flex flex-col items-center">
+              <ParticipantTile
+                identity={p.identity}
+                name={p.name}
+                role={p.identity === hostId ? "HOST" : "SPEAKER"}
+                isSpeaking={p.isSpeaking}
+                isCurrentUser={p.identity === currentUserId}
+              />
+              {isHost && p.identity !== hostId && (
+                <button
+                  onClick={() => removeSpeaker(p.identity)}
+                  className="mt-1 text-[10px] text-red-400 hover:text-red-600 font-mono transition-colors"
+                >
+                  remove
+                </button>
+              )}
+            </div>
           ))}
         </div>
       </div>
 
+      {/* Admitted notification */}
+      {!isHost && myRole === "SPEAKER" && (
+        <div className="rounded-xl border border-brand-indigo/20 bg-brand-indigo/5 px-4 py-3 text-sm text-brand-indigo font-medium">
+          You&apos;ve been admitted as a speaker — unmute to speak.
+        </div>
+      )}
+
+      {/* Controls */}
       <div className="flex items-center gap-3 pt-4 border-t border-brand-indigo/10 flex-wrap">
         {canPublish && (
           <button
@@ -197,13 +301,31 @@ function SpaceRoomInner({
           </a>
         )}
 
-        {isHost && (
+        {isHost && !endConfirming && (
           <button
-            onClick={endSpace}
+            onClick={() => setEndConfirming(true)}
             className="ml-auto px-5 py-2.5 rounded-full bg-red-500/80 hover:bg-red-500 text-white text-sm font-semibold transition-colors"
           >
             End Space
           </button>
+        )}
+
+        {isHost && endConfirming && (
+          <div className="ml-auto flex items-center gap-2 flex-wrap">
+            <span className="text-sm text-brand-navy/60">End space for everyone?</span>
+            <button
+              onClick={endSpace}
+              className="px-4 py-2 rounded-full bg-red-500 hover:bg-red-600 text-white text-sm font-semibold transition-colors"
+            >
+              Yes, end
+            </button>
+            <button
+              onClick={() => setEndConfirming(false)}
+              className="px-4 py-2 rounded-full bg-brand-navy/8 hover:bg-brand-navy/15 text-brand-navy/55 text-sm font-semibold transition-colors"
+            >
+              Cancel
+            </button>
+          </div>
         )}
       </div>
     </div>

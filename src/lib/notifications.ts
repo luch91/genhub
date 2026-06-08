@@ -18,6 +18,7 @@ const EMAIL_TYPES = new Set<NotificationType>([
   "PROJECT_EXPIRED",
   "FOLLOW",
   "DISCUSSION_REPLY",
+  "UPVOTE_MILESTONE",
 ])
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000"
@@ -58,6 +59,28 @@ export async function notifyUser(
       })
     }
   }
+}
+
+export async function notifyAllBuilders(
+  excludeUserId: string,
+  type: NotificationType,
+  message: string,
+  link?: string
+) {
+  const users = await db.user.findMany({
+    where: { id: { not: excludeUserId }, username: { not: null } },
+    select: { id: true },
+  })
+  if (users.length === 0) return
+
+  await db.notification.createMany({
+    data: users.map((u) => ({
+      userId:  u.id,
+      type,
+      message,
+      link:    link ?? null,
+    })),
+  })
 }
 
 export async function notifyFollowers(

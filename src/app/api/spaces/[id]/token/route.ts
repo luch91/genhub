@@ -2,6 +2,7 @@ import { NextResponse } from "next/server"
 import { auth } from "@/lib/auth"
 import { db } from "@/lib/db"
 import { AccessToken } from "livekit-server-sdk"
+import { notifyAllBuilders } from "@/lib/notifications"
 
 export async function POST(
   req: Request,
@@ -44,6 +45,13 @@ export async function POST(
       where: { id },
       data: { status: "LIVE", startedAt: new Date() },
     })
+    const hostName = session.user.name ?? session.user.email ?? "A builder"
+    notifyAllBuilders(
+      session.user.id,
+      "SPACE_LIVE",
+      `${hostName} just started a live space: "${space.title}"`,
+      `/spaces/${id}`
+    ).catch(() => {})
   }
 
   // TTL set to 6 hours — default Livekit token expires in 6 minutes which would

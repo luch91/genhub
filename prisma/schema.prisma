@@ -207,6 +207,8 @@ enum NotificationType {
   NEW_PROJECT
   COMMENT
   DISCUSSION_REPLY
+  SPACE_LIVE
+  UPVOTE_MILESTONE
 }
 
 model Notification {
