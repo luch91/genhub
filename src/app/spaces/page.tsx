@@ -23,7 +23,7 @@ export default async function SpacesPage() {
           <p className="text-[11px] font-mono tracking-widest text-brand-indigo uppercase mb-1">
             Live Audio
           </p>
-          <h1 className="font-display text-3xl font-black text-brand-navy">Spaces</h1>
+          <h1 className="font-display text-3xl font-black text-brand-navy">GenHub Space</h1>
           <p className="text-brand-navy/55 text-sm mt-1">
             Live audio rooms for the GenLayer builder community.
           </p>
@@ -32,7 +32,7 @@ export default async function SpacesPage() {
           href="/spaces/create"
           className="shrink-0 btn-primary py-2 text-sm"
         >
-          + Start a Space
+          + Start a GenHub Space
         </Link>
       </div>
 
@@ -56,7 +56,7 @@ export default async function SpacesPage() {
 
       {past.length > 0 && (
         <section>
-          <h2 className="section-heading mb-4">Past Spaces</h2>
+          <h2 className="section-heading mb-4">Past</h2>
           <div className="grid gap-4 sm:grid-cols-2">
             {past.map((s) => <SpaceCard key={s.id} space={s} />)}
           </div>

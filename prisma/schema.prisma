@@ -346,6 +346,7 @@ model Space {
   roomName      String      @unique
   listenerCount Int         @default(0)
   replayUrl     String?
+  xSpaceUrl     String?
   createdAt     DateTime    @default(now())
   updatedAt     DateTime    @updatedAt
 

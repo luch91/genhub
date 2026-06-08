@@ -9,8 +9,7 @@ const NAV_LINKS = [
   { href: "/builders", label: "Builders" },
   { href: "/feed",     label: "Feed" },
   { href: "/discuss",  label: "Discuss" },
-  { href: "/sessions", label: "Sessions" },
-  { href: "/spaces",   label: "Spaces" },
+  { href: "/spaces",   label: "GenHub Space" },
 ]
 
 export function MobileNav({ eligible }: { eligible: boolean }) {

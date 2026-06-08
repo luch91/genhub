@@ -130,6 +130,7 @@ export const createSpaceSchema = z.object({
   scheduledAt: z.string().datetime().optional(),
   projectId:   z.string().optional(),
   tags:        z.array(z.string()).max(5).default([]),
+  xSpaceUrl:   z.string().url("Must be a valid URL").optional(),
 })
 
 export type CreateSpaceInput = z.infer<typeof createSpaceSchema>

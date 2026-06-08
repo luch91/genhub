@@ -80,12 +80,14 @@ function SpaceRoomInner({
   hostId,
   currentUserId,
   role,
+  xSpaceUrl,
   onEnd,
 }: {
   spaceId:       string
   hostId:        string
   currentUserId: string
   role:          string
+  xSpaceUrl?:    string | null
   onEnd:         () => void
 }) {
   const participants                              = useParticipants()
@@ -184,6 +186,17 @@ function SpaceRoomInner({
           </button>
         )}
 
+        {xSpaceUrl && (
+          <a
+            href={xSpaceUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="px-5 py-2.5 rounded-full bg-black hover:bg-black/80 text-white text-sm font-semibold transition-colors"
+          >
+            𝕏 Also on X Spaces
+          </a>
+        )}
+
         {isHost && (
           <button
             onClick={endSpace}
@@ -203,10 +216,12 @@ export function SpaceRoom({
   spaceId,
   hostId,
   currentUserId,
+  xSpaceUrl,
 }: {
   spaceId:       string
   hostId:        string
   currentUserId: string
+  xSpaceUrl?:    string | null
 }) {
   const router = useRouter()
   const [token, setToken] = useState<string | null>(null)
@@ -271,6 +286,7 @@ export function SpaceRoom({
         hostId={hostId}
         currentUserId={currentUserId}
         role={role}
+        xSpaceUrl={xSpaceUrl}
         onEnd={handleEnd}
       />
     </LiveKitRoom>

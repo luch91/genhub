@@ -17,13 +17,15 @@ export function CreateSpaceForm() {
     setLoading(true)
 
     const form = e.currentTarget
+    const xSpaceRaw = (form.elements.namedItem("xSpaceUrl") as HTMLInputElement).value.trim()
     const data = {
       title:       (form.elements.namedItem("title")       as HTMLInputElement).value,
       description: (form.elements.namedItem("description") as HTMLTextAreaElement).value || undefined,
       scheduledAt: (form.elements.namedItem("scheduledAt") as HTMLInputElement).value
         ? new Date((form.elements.namedItem("scheduledAt") as HTMLInputElement).value).toISOString()
         : undefined,
-      tags: [],
+      xSpaceUrl:   xSpaceRaw || undefined,
+      tags:        [],
     }
 
     const result = createSpaceSchema.safeParse(data)
@@ -96,13 +98,25 @@ export function CreateSpaceForm() {
         />
       </Field>
 
+      <Field
+        label="X Space URL"
+        hint="Optional — paste your X Space link if you're also hosting there."
+        error={errors.xSpaceUrl}
+      >
+        <input
+          name="xSpaceUrl"
+          type="url"
+          className="input"
+          placeholder="https://x.com/i/spaces/..."
+        />
+      </Field>
+
       <div className="rounded-xl border border-brand-indigo/10 bg-brand-indigo/3 px-4 py-3 text-sm text-brand-navy/55">
         You&apos;ll be the host. Listeners can raise their hand to speak and you can admit them.
-        Livekit credentials are required to go live.
       </div>
 
       <button type="submit" disabled={loading} className="btn-primary w-full py-2.5">
-        {loading ? "Starting..." : "Start space"}
+        {loading ? "Starting..." : "Start GenHub Space"}
       </button>
     </form>
   )

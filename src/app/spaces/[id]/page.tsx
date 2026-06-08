@@ -75,6 +75,7 @@ export default async function SpacePage({
         spaceId={space.id}
         hostId={space.hostId}
         currentUserId={session.user.id}
+        xSpaceUrl={space.xSpaceUrl}
       />
     </main>
   )

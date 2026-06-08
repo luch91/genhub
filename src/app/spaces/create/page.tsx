@@ -12,7 +12,7 @@ export default async function CreateSpacePage() {
         <p className="text-[11px] font-mono tracking-widest text-brand-indigo uppercase mb-1">
           Live Audio
         </p>
-        <h1 className="font-display text-3xl font-black text-brand-navy">Start a Space</h1>
+        <h1 className="font-display text-3xl font-black text-brand-navy">Start a GenHub Space</h1>
         <p className="mt-2 text-brand-navy/55">
           Host a live audio room for the GenLayer builder community.
         </p>

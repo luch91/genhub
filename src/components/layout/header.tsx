@@ -31,8 +31,7 @@ export async function Header() {
           <Link href="/builders"  className="btn-ghost py-1.5 text-sm">Builders</Link>
           <Link href="/feed"      className="btn-ghost py-1.5 text-sm">Feed</Link>
           <Link href="/discuss"   className="btn-ghost py-1.5 text-sm">Discuss</Link>
-          <Link href="/sessions"  className="btn-ghost py-1.5 text-sm">Sessions</Link>
-          <Link href="/spaces"    className="btn-ghost py-1.5 text-sm">Spaces</Link>
+          <Link href="/spaces"    className="btn-ghost py-1.5 text-sm">GenHub Space</Link>
           {eligible && (
             <Link href="/review" className="btn-ghost py-1.5 text-sm font-medium text-brand-amber-dk hover:text-brand-amber-dk">
               Review
