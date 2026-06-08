@@ -43,7 +43,7 @@ export function ProofStrip() {
         transition={{ duration: 0.5 }}
       >
         <span className="font-mono text-xs font-bold uppercase tracking-[0.18em] text-brand-navy/40">
-          Built by the{" "}
+          Built for the{" "}
           <span className="text-brand-indigo">GenLayer</span> builder community
         </span>
       </motion.div>
