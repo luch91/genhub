@@ -1,6 +1,7 @@
 import Link from "next/link"
 import Image from "next/image"
 import type { BuilderWithRelations } from "@/types"
+import { OnlineDot } from "@/components/ui/online-dot"
 
 type Props = { builder: BuilderWithRelations }
 
@@ -26,7 +27,10 @@ export function BuilderCard({ builder }: Props) {
             {builder.name ?? builder.username}
           </p>
           {builder.username && (
-            <p className="font-mono text-xs text-brand-navy/45">@{builder.username}</p>
+            <p className="flex items-center gap-1.5 font-mono text-xs text-brand-navy/45">
+              @{builder.username}
+              <OnlineDot lastSeenAt={builder.lastSeenAt} />
+            </p>
           )}
         </div>
       </div>

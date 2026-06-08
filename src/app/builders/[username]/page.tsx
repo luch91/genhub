@@ -6,6 +6,7 @@ import { db } from "@/lib/db"
 import { auth } from "@/lib/auth"
 import { ProjectCard } from "@/components/projects/project-card"
 import { FollowButton } from "@/components/builders/follow-button"
+import { OnlineDot } from "@/components/ui/online-dot"
 import { formatDate } from "@/lib/utils"
 
 type PageProps = { params: Promise<{ username: string }> }
@@ -70,7 +71,10 @@ export default async function BuilderProfilePage({ params }: PageProps) {
 
         <div className="flex-1">
           <h1 className="font-display text-2xl font-black text-brand-navy">{builder.name}</h1>
-          <p className="font-mono text-sm text-brand-navy/45">@{builder.username}</p>
+          <p className="flex items-center gap-1.5 font-mono text-sm text-brand-navy/45">
+            @{builder.username}
+            <OnlineDot lastSeenAt={builder.lastSeenAt} />
+          </p>
           {builder.bio && (
             <p className="mt-3 max-w-xl text-brand-navy/55">{builder.bio}</p>
           )}

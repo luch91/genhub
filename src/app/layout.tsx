@@ -6,6 +6,7 @@ import { ConditionalShell } from "@/components/layout/conditional-shell"
 import { Header } from "@/components/layout/header"
 import { Footer } from "@/components/layout/footer"
 import { SoundToggle } from "@/components/landing/sound-toggle"
+import { PresencePing } from "@/components/layout/presence-ping"
 import "./globals.css"
 
 const inter        = Inter({ subsets: ["latin"], variable: "--font-inter" })
@@ -49,6 +50,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" className={fontVars}>
       <body>
         <Providers>
+          <PresencePing />
           <LenisProvider>
             <ConditionalShell
               header={<Header />}

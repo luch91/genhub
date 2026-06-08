@@ -62,6 +62,7 @@ model User {
   walletAddress     String?   @unique
   submissionCredits Int       @default(2)
   reputationScore   Int       @default(0)
+  lastSeenAt        DateTime?
   createdAt         DateTime  @default(now())
   updatedAt         DateTime  @updatedAt
 
