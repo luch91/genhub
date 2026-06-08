@@ -46,7 +46,8 @@ export async function createProject(formData: FormData) {
       contractAddress: contractAddress || null,
       repoUrl: repoUrl || null,
       demoUrl: demoUrl || null,
-      status: "PENDING_REVIEW",
+      status: "PUBLISHED",
+      publishedAt: new Date(),
       authorId: session.user.id,
       tags: {
         create: await Promise.all(

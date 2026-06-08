@@ -32,6 +32,30 @@ export async function POST(request: NextRequest) {
     },
   })
 
+  const commenter = await db.user.findUnique({
+    where: { id: session.user.id },
+    select: { name: true, username: true, lastCommentCredit: true },
+  })
+
+  const oneWeekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
+  const eligibleForCredit =
+    !commenter?.lastCommentCredit || commenter.lastCommentCredit < oneWeekAgo
+
+  const tasks: Promise<unknown>[] = []
+
+  // Award comment credit once per week globally
+  if (eligibleForCredit) {
+    tasks.push(
+      db.user.update({
+        where: { id: session.user.id },
+        data: {
+          submissionCredits: { increment: 1 },
+          lastCommentCredit: new Date(),
+        },
+      })
+    )
+  }
+
   // Notify project author (if comment is on a project and they're not the commenter)
   if (projectId) {
     const project = await db.project.findUnique({
@@ -39,19 +63,19 @@ export async function POST(request: NextRequest) {
       select: { authorId: true, title: true, slug: true },
     })
     if (project && project.authorId !== session.user.id) {
-      const me = await db.user.findUnique({
-        where: { id: session.user.id },
-        select: { name: true, username: true },
-      })
-      const actorName = me?.name ?? me?.username ?? "Someone"
-      await notifyUser(
-        project.authorId,
-        "COMMENT",
-        `${actorName} commented on your project "${project.title}"`,
-        `/projects/${project.slug}`
+      const actorName = commenter?.name ?? commenter?.username ?? "Someone"
+      tasks.push(
+        notifyUser(
+          project.authorId,
+          "COMMENT",
+          `${actorName} commented on your project "${project.title}"`,
+          `/projects/${project.slug}`
+        )
       )
     }
   }
+
+  await Promise.all(tasks)
 
   return Response.json(comment, { status: 201 })
 }

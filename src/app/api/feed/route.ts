@@ -72,16 +72,33 @@ export async function POST(request: NextRequest) {
 
   const me = await db.user.findUnique({
     where: { id: session.user.id },
-    select: { name: true, username: true },
+    select: { name: true, username: true, lastBuildUpdateCredit: true },
   })
   const actorName = me?.name ?? me?.username ?? "A builder"
 
-  await notifyFollowers(
-    session.user.id,
-    "NEW_UPDATE",
-    `${actorName} posted an update on "${update.project.title}"`,
-    `/projects/${update.project.slug}`
-  )
+  const HIGH_SIGNAL_TYPES = new Set(["MILESTONE", "BREAKTHROUGH"])
+  const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000)
+  const eligibleForCredit =
+    HIGH_SIGNAL_TYPES.has(result.data.type) &&
+    (!me?.lastBuildUpdateCredit || me.lastBuildUpdateCredit < oneDayAgo)
+
+  await Promise.all([
+    notifyFollowers(
+      session.user.id,
+      "NEW_UPDATE",
+      `${actorName} posted an update on "${update.project.title}"`,
+      `/projects/${update.project.slug}`
+    ),
+    eligibleForCredit
+      ? db.user.update({
+          where: { id: session.user.id },
+          data: {
+            submissionCredits:     { increment: 1 },
+            lastBuildUpdateCredit: new Date(),
+          },
+        })
+      : Promise.resolve(),
+  ])
 
   return Response.json(update, { status: 201 })
 }

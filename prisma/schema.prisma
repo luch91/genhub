@@ -60,9 +60,11 @@ model User {
   githubHandle  String?
   website       String?
   walletAddress     String?   @unique
-  submissionCredits Int       @default(2)
-  reputationScore   Int       @default(0)
-  lastSeenAt        DateTime?
+  submissionCredits     Int       @default(2)
+  reputationScore       Int       @default(0)
+  lastSeenAt            DateTime?
+  lastBuildUpdateCredit DateTime?
+  lastCommentCredit     DateTime?
   createdAt         DateTime  @default(now())
   updatedAt         DateTime  @updatedAt
 
@@ -101,7 +103,7 @@ model Project {
   genlayerAngle String        @db.Text
   contractAddress String?
   verified       Boolean       @default(false)
-  creditRestored Boolean       @default(false)
+  upvoteCreditsAwarded Int     @default(0)
   repoUrl        String?
   demoUrl        String?
   coverImage     String?
