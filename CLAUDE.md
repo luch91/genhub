@@ -10,8 +10,8 @@ A full-stack Next.js web application where the GenLayer developer community gath
 - Discover and upvote other builders' work
 - Verify deployed contract addresses
 - Connect with other builders via profiles
-- Watch and schedule YouTube-embedded builder sessions
-- Join and host live audio rooms (Spaces) powered by Livekit
+- Join and host live audio rooms (GenHub Space) powered by Livekit, with optional X Space fallback
+- Sessions (YouTube embeds) — code intact, hidden from nav pending Twitch integration
 
 ## Tech Stack
 
@@ -43,7 +43,8 @@ src/
 │   │   └── [id]/           # Live space room page
 │   ├── api/                # API route handlers
 │   │   ├── sessions/       # GET/POST sessions, PATCH/DELETE [id]
-│   │   └── spaces/         # GET/POST spaces, token/end/raise-hand/admit
+│   │   ├── spaces/         # GET/POST spaces + [id]/ token/end/raise-hand/admit/participants/my-role/remove-speaker
+│   │   └── user/           # PATCH profile, POST avatar, POST ping (presence)
 │   ├── layout.tsx
 │   ├── page.tsx            # Landing page
 │   ├── globals.css
@@ -58,6 +59,7 @@ src/
 ├── lib/
 │   ├── auth.ts
 │   ├── db.ts               # Prisma client singleton
+│   ├── notifications.ts    # notifyUser(), notifyFollowers(), notifyAllBuilders()
 │   ├── utils.ts            # cn(), slugify(), extractYouTubeId(), generateRoomName()
 │   └── validations.ts      # Zod schemas for all forms/APIs
 └── types/
@@ -68,9 +70,9 @@ prisma/
 
 ## Domain Model
 
-**User (Builder)** — A registered member with a username, bio, optional wallet address, and social links. Authors projects and posts updates.
+**User (Builder)** — A registered member with a username, bio, optional wallet address, and social links. Tracks `submissionCredits`, `reputationScore`, `lastSeenAt` (presence), `lastBuildUpdateCredit`, and `lastCommentCredit` (credit rate-limiting).
 
-**Project** — A GenLayer project submission with title, tagline, description, and a required `genlayerAngle` field ("What's only possible on GenLayer?"). Has optional verified `contractAddress`, `repoUrl`, and `demoUrl`.
+**Project** — A GenLayer project submission with title, tagline, description, and a required `genlayerAngle` field ("What's only possible on GenLayer?"). Has optional verified `contractAddress`, `repoUrl`, and `demoUrl`. `upvoteCreditsAwarded` (0–3) tracks how many milestone credits have been given to the author.
 
 **ProjectUpdate** — A "build in public" feed post tied to a project. Type is one of `MILESTONE | BLOCKER | BREAKTHROUGH | GENERAL`. These populate the main community feed.
 
@@ -151,7 +153,7 @@ Project slugs are derived from the title via `slugify()` in `@/lib/utils`. Uniqu
 
 ## Feature Status
 
-- [x] Project submission, gallery, tag filtering
+- [x] Project submission, gallery, tag filtering — auto-publishes instantly, no peer review
 - [x] Builder profiles, follow system
 - [x] Build-in-public feed
 - [x] Upvoting with 2-week expiry cron
@@ -161,9 +163,17 @@ Project slugs are derived from the title via `slugify()` in `@/lib/utils`. Uniqu
 - [x] "Remix This" project fork flow
 - [x] Email notifications (Resend)
 - [x] Discussion board
-- [x] In-app notifications with bell icon
-- [x] Sessions — YouTube-embedded builder sessions (`/sessions`)
-- [x] Spaces — Live audio rooms via Livekit (`/spaces`)
-- [ ] Sessions / Spaces tag picker (tags field omitted from create forms for now)
+- [x] In-app notifications with bell icon — SPACE_LIVE and NEW_PROJECT broadcast to all; UPVOTE_MILESTONE emails author
+- [x] Credit system — +1 at 5/10/25 upvotes; +1 for MILESTONE/BREAKTHROUGH updates (daily); +1 for comments (weekly)
+- [x] Online presence — green dot via lastSeenAt + PresencePing + OnlineDot
+- [x] Mobile hamburger navigation
+- [x] GenHub Space — live audio rooms via Livekit with host controls (raise hand, admit, remove speaker, X Space fallback)
+- [x] Sessions — YouTube-embedded sessions (`/sessions`), hidden from nav; code intact for Twitch
+- [ ] Sessions / Spaces tag picker
 - [ ] Sessions edit form (PATCH /api/sessions/[id] exists, no UI yet)
 - [ ] Weekly community challenges / bounties
+
+## Important Windows Dev Notes
+
+- **EPERM on `db:generate`**: The dev server locks the Prisma query engine DLL. Kill all node processes (`Stop-Process -Name node -Force` in PowerShell) before running `db:generate` or `db:push`, then restart the dev server.
+- **framer-motion** must only be used in Client Components (`"use client"`). Never import `motion.*` in Server Components.

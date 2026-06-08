@@ -89,7 +89,8 @@ Projects go live instantly on submission and are community-curated through upvot
 
 ### Upvoting
 - One upvote per user per project
-- Upvoting a project that hits 5 upvotes restores one submission credit to the author (once per project)
+- Author earns +1 credit at 5, 10, and 25 upvotes (each milestone independently, tracked by `upvoteCreditsAwarded`)
+- Author receives an in-app + email notification at each milestone
 
 ### Onboarding
 - First-time OAuth sign-in redirects to `/onboarding`
@@ -108,13 +109,20 @@ Projects go live instantly on submission and are community-curated through upvot
 - Paste any YouTube URL format (watch, youtu.be, /live/) — the video ID is extracted automatically
 - Sessions have three states: **Scheduled** (shows date), **Live** (embed appears), **Ended** (replay embed)
 
-### Spaces (Live Audio)
+### GenHub Space (Live Audio)
 - Host live audio rooms at `/spaces` powered by [Livekit](https://livekit.io)
 - Any signed-in builder can start a space and become the host
-- Listeners can raise their hand; the host can admit them as speakers
-- Hosts can end the space and optionally save a YouTube replay URL
+- Listeners can raise their hand; the host sees raised hands in real time and can admit them as speakers
+- Host can remove speakers mid-session; admitted speakers get an unmute button automatically
+- Inline end-space confirmation — no disruptive browser prompts
+- Optional X Space URL — paste an X (Twitter) Spaces link to cross-post; a join button appears on the card and inside the room
 - 6-hour token TTL prevents silent mid-session disconnects
 - Automatic WebSocket reconnection on mobile screen lock / network drop
+- All builders are notified when a space goes live
+
+### Online Presence
+- A small green dot appears next to a builder's username when they were active within the last 5 minutes
+- Presence is tracked via a throttled ping (`POST /api/user/ping`) sent every 4 minutes by the client
 
 ---
 
@@ -169,10 +177,14 @@ genhub/
 │   │   │   │   └── [id]/
 │   │   │   │       ├── admit/
 │   │   │   │       ├── end/
+│   │   │   │       ├── my-role/
+│   │   │   │       ├── participants/
 │   │   │   │       ├── raise-hand/
+│   │   │   │       ├── remove-speaker/
 │   │   │   │       └── token/
 │   │   │   └── user/
-│   │   │       └── avatar/  # Vercel Blob avatar upload
+│   │   │       ├── avatar/  # Vercel Blob avatar upload
+│   │   │       └── ping/    # Presence heartbeat
 │   │   ├── builders/
 │   │   │   ├── page.tsx          # Builder directory
 │   │   │   └── [username]/       # Builder profile
@@ -224,7 +236,8 @@ genhub/
 │   │   ├── auth.ts           # NextAuth config (GitHub + Google)
 │   │   ├── db.ts             # Prisma singleton
 │   │   ├── email.ts          # Resend raw fetch helper
-│   │   ├── notifications.ts  # notifyUser() + notifyFollowers()
+│   │   ├── notifications.ts  # notifyUser() + notifyFollowers() + notifyAllBuilders()
+│   │   ├── review.ts         # canReview() — retained for future peer review gate
 │   │   ├── utils.ts          # cn(), slugify(), extractYouTubeId(), generateRoomName()
 │   │   └── validations.ts    # Zod schemas
 │   └── types/
@@ -435,16 +448,19 @@ All forms are validated with Zod on both client and server. Schemas live in `src
 - `name` — display name, editable; may differ from OAuth name
 - `image` — avatar URL; defaults to OAuth avatar, overridable via Vercel Blob upload
 - `bio`, `twitterHandle`, `githubHandle`, `website`, `walletAddress`
-- `submissionCredits` — starts at 2; spent on submission, earned back at 5 upvotes
-- `reputationScore` — incremented by upvotes and publishing
+- `submissionCredits` — starts at 2; spent on submission, earned back via upvote milestones, build updates, and comments
+- `reputationScore` — tracked but not actively gated (reserved for future use)
+- `lastSeenAt` — updated by presence ping; used for the online green dot (5-minute window)
+- `lastBuildUpdateCredit` / `lastCommentCredit` — rate-limit timestamps for activity credit awards
 
 ### Project
 
 - `slug` — unique, URL-safe identifier derived from title
 - `genlayerAngle` — required: "What's only possible on GenLayer?"
 - `contractAddress` + `verified` — optional on-chain proof
-- `status` — `DRAFT | PENDING_REVIEW | PUBLISHED | ARCHIVED | EXPIRED`
+- `status` — `DRAFT | PENDING_REVIEW | PUBLISHED | ARCHIVED | EXPIRED` (new projects go directly to `PUBLISHED`)
 - `publishedAt` — set when first published; reset on resubmit; used by the expiry cron
+- `upvoteCreditsAwarded` — integer 0–3 tracking how many upvote milestone credits have been given
 - `remixedFromId` — nullable self-relation for the remix fork flow
 
 ---
@@ -471,13 +487,17 @@ EXPIRY_DAYS: 14
 
 ## Submission Credits
 
-| Action | Credits |
-|--------|---------|
-| Account created | +2 |
-| Project submitted | −1 |
-| Published project reaches 5 upvotes | +1 (once per project) |
+| Action | Credits | Notes |
+|--------|---------|-------|
+| Account created | +2 | Starting balance |
+| Project submitted | −1 | Costs one credit |
+| Project hits 5 upvotes | +1 | First milestone |
+| Project hits 10 upvotes | +1 | Second milestone |
+| Project hits 25 upvotes | +1 | Third milestone |
+| Post a MILESTONE or BREAKTHROUGH update | +1 | Max once per 24 hours |
+| Leave a comment | +1 | Max once per 7 days (global, not per project) |
 
-Zero credits = cannot submit until one is earned back.
+Zero credits = cannot submit until one is earned back. Rate limits are tracked via `lastBuildUpdateCredit` and `lastCommentCredit` on the `User` model.
 
 ---
 
@@ -496,17 +516,19 @@ Zero credits = cannot submit until one is earned back.
 
 All notifications are stored in the `Notification` table and shown via the bell icon in the header.
 
-| Type | Trigger |
-|------|---------|
-| `FOLLOW` | Someone follows you |
-| `PROJECT_REVIEW` | A review is submitted on your project |
-| `PROJECT_PUBLISHED` | Your project is published |
-| `PROJECT_REJECTED` | Your project is sent back with feedback |
-| `PROJECT_EXPIRED` | Your project was removed for low upvotes |
-| `NEW_PROJECT` | A builder you follow submits a project |
-| `NEW_UPDATE` | A builder you follow posts a feed update |
-| `COMMENT` | Someone comments on your project |
-| `DISCUSSION_REPLY` | Someone replies to your discussion |
+| Type | Trigger | Audience |
+|------|---------|----------|
+| `FOLLOW` | Someone follows you | You |
+| `PROJECT_REVIEW` | A review is submitted on your project | You |
+| `PROJECT_PUBLISHED` | Your project is approved and published | You |
+| `PROJECT_REJECTED` | Your project is sent back with feedback | You |
+| `PROJECT_EXPIRED` | Your project was removed for low upvotes | You |
+| `NEW_PROJECT` | A builder publishes a new project | All builders |
+| `NEW_UPDATE` | A builder you follow posts a feed update | Your followers |
+| `COMMENT` | Someone comments on your project | You |
+| `DISCUSSION_REPLY` | Someone replies to your discussion | You |
+| `SPACE_LIVE` | A builder starts a live space | All builders |
+| `UPVOTE_MILESTONE` | Your project hits 5, 10, or 25 upvotes | You (+ email) |
 
 ---
 
@@ -514,9 +536,12 @@ All notifications are stored in the `Notification` table and shown via the bell 
 
 Emails are sent via the [Resend](https://resend.com) REST API using a raw `fetch` call (no SDK). If `RESEND_API_KEY` is not set, all email sending is silently skipped — the app works without it.
 
-Email is sent for: `COMMENT`, `PROJECT_PUBLISHED`, `PROJECT_REJECTED`, `PROJECT_EXPIRED`, `FOLLOW`, `DISCUSSION_REPLY`.
+Email is sent for: `COMMENT`, `PROJECT_PUBLISHED`, `PROJECT_REJECTED`, `PROJECT_EXPIRED`, `FOLLOW`, `DISCUSSION_REPLY`, `UPVOTE_MILESTONE`.
 
-The `sendEmail()` helper lives in `src/lib/email.ts`. The `notifyUser()` and `notifyFollowers()` helpers in `src/lib/notifications.ts` call it automatically for email-eligible notification types.
+The `sendEmail()` helper lives in `src/lib/email.ts`. Three helpers in `src/lib/notifications.ts` handle delivery:
+- `notifyUser(userId, type, message, link)` — notify one user, send email if type is in EMAIL_TYPES
+- `notifyFollowers(ofUserId, type, message, link)` — notify all followers of a user
+- `notifyAllBuilders(excludeUserId, type, message, link)` — broadcast to all onboarded builders (in-app only, no email)
 
 ---
 
@@ -591,6 +616,7 @@ All routes return JSON. Errors always return `{ "error": "message" }` with the a
 |--------|------|------|-------------|
 | `PATCH` | `/api/user` | Yes | Update profile fields |
 | `POST` | `/api/user/avatar` | Yes | Upload avatar to Vercel Blob |
+| `POST` | `/api/user/ping` | Yes | Update lastSeenAt for presence (throttled to once per 60s) |
 
 ### Feed
 
@@ -647,7 +673,10 @@ All routes return JSON. Errors always return `{ "error": "message" }` with the a
 | `POST` | `/api/spaces/[id]/token` | Yes | Get Livekit join token (upserts participant) |
 | `POST` | `/api/spaces/[id]/end` | Host | End space + delete Livekit room |
 | `POST` | `/api/spaces/[id]/raise-hand` | Participant | Toggle hand raised |
-| `POST` | `/api/spaces/[id]/admit` | Host | Promote listener to speaker |
+| `POST` | `/api/spaces/[id]/admit` | Host | Promote listener to speaker (updates Livekit permissions live) |
+| `POST` | `/api/spaces/[id]/remove-speaker` | Host | Demote speaker back to listener |
+| `GET` | `/api/spaces/[id]/participants` | Host | List all participants with role and handRaised status |
+| `GET` | `/api/spaces/[id]/my-role` | Participant | Get current user's role in the space |
 
 ### Cron
 
