@@ -4,6 +4,7 @@ import { auth } from "@/lib/auth"
 import { db } from "@/lib/db"
 import { AdminUsersTable } from "@/components/admin/admin-users-table"
 import { AdminProjectsTable } from "@/components/admin/admin-projects-table"
+import { AdminDiscussionsTable } from "@/components/admin/admin-discussions-table"
 
 export const metadata: Metadata = { title: "Admin" }
 
@@ -11,7 +12,7 @@ export default async function AdminPage() {
   const session = await auth()
   if (!session?.user?.isAdmin) redirect("/")
 
-  const [users, projects] = await Promise.all([
+  const [users, projects, discussions] = await Promise.all([
     db.user.findMany({
       where: { username: { not: null } },
       orderBy: { createdAt: "desc" },
@@ -29,6 +30,14 @@ export default async function AdminPage() {
         id: true, title: true, slug: true, featured: true, createdAt: true,
         author: { select: { name: true, username: true } },
         _count: { select: { upvotes: true } },
+      },
+    }),
+    db.discussion.findMany({
+      orderBy: [{ pinned: "desc" }, { createdAt: "desc" }],
+      select: {
+        id: true, title: true, category: true, pinned: true, createdAt: true,
+        author: { select: { name: true, username: true } },
+        _count: { select: { replies: true } },
       },
     }),
   ])
@@ -54,6 +63,13 @@ export default async function AdminPage() {
           Published Projects ({projects.length})
         </h2>
         <AdminProjectsTable projects={projects} />
+      </section>
+
+      <section>
+        <h2 className="font-ui text-lg font-bold text-brand-navy mb-4">
+          Discussions ({discussions.length})
+        </h2>
+        <AdminDiscussionsTable discussions={discussions} />
       </section>
     </div>
   )
