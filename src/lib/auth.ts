@@ -9,8 +9,11 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [GitHub, Google],
   callbacks: {
     session({ session, user }) {
-      session.user.id = user.id
-      session.user.username = (user as unknown as { username: string | null }).username ?? null
+      const u = user as unknown as { username: string | null; isAdmin: boolean; isBanned: boolean }
+      session.user.id      = user.id
+      session.user.username = u.username ?? null
+      session.user.isAdmin  = u.isAdmin  ?? false
+      session.user.isBanned = u.isBanned ?? false
       return session
     },
   },

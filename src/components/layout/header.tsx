@@ -37,6 +37,11 @@ export async function Header() {
               Review
             </Link>
           )}
+          {session?.user?.isAdmin && (
+            <Link href="/admin" className="btn-ghost py-1.5 text-sm font-medium text-brand-indigo hover:text-brand-indigo/80">
+              Admin
+            </Link>
+          )}
         </nav>
 
         {/* Auth */}
@@ -54,7 +59,7 @@ export async function Header() {
               Sign in
             </Link>
           )}
-          <MobileNav eligible={eligible} />
+          <MobileNav eligible={eligible} isAdmin={session?.user?.isAdmin ?? false} />
         </div>
       </div>
     </header>

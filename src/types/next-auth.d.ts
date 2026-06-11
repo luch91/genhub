@@ -3,8 +3,10 @@ import type { DefaultSession } from "next-auth"
 declare module "next-auth" {
   interface Session {
     user: {
-      id: string
+      id:       string
       username?: string | null
+      isAdmin?:  boolean
+      isBanned?: boolean
     } & DefaultSession["user"]
   }
 }

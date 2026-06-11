@@ -12,7 +12,7 @@ const NAV_LINKS = [
   { href: "/spaces",   label: "GenHub Space" },
 ]
 
-export function MobileNav({ eligible }: { eligible: boolean }) {
+export function MobileNav({ eligible, isAdmin }: { eligible: boolean; isAdmin: boolean }) {
   const [open, setOpen] = useState(false)
   const pathname = usePathname()
 
@@ -65,6 +65,15 @@ export function MobileNav({ eligible }: { eligible: boolean }) {
                   onClick={() => setOpen(false)}
                 >
                   Review
+                </Link>
+              )}
+              {isAdmin && (
+                <Link
+                  href="/admin"
+                  className="block py-3 text-sm font-medium text-brand-indigo hover:text-brand-indigo/80 transition-colors"
+                  onClick={() => setOpen(false)}
+                >
+                  Admin
                 </Link>
               )}
             </nav>

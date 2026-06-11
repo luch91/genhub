@@ -20,7 +20,7 @@ async function getProjects(tag?: string, sort?: string) {
       ? { updates: { _count: "desc" as const } }
       : { createdAt: "desc" as const }
 
-  return db.project.findMany({
+  const projects = await db.project.findMany({
     where: {
       status: "PUBLISHED",
       ...(tag ? { tags: { some: { tag: { slug: tag } } } } : {}),
@@ -32,6 +32,12 @@ async function getProjects(tag?: string, sort?: string) {
       _count: { select: { upvotes: true, comments: true, updates: true } },
     },
   })
+
+  // Featured projects always appear first
+  return [
+    ...projects.filter((p) => p.featured),
+    ...projects.filter((p) => !p.featured),
+  ]
 }
 
 export default async function ProjectsPage({ searchParams }: PageProps) {

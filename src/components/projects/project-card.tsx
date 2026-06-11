@@ -31,6 +31,11 @@ export function ProjectCard({ project }: Props) {
 
       {/* Tags */}
       <div className="flex flex-wrap gap-1">
+        {project.featured && (
+          <span className="badge bg-brand-amber/15 text-brand-amber-dk border border-brand-amber/20 text-xs font-semibold">
+            Featured
+          </span>
+        )}
         {project.tags.slice(0, 3).map(({ tag }) => (
           <span
             key={tag.id}
