@@ -1,5 +1,8 @@
 import type { Metadata } from "next"
 import { Inter, JetBrains_Mono, Unbounded, Syne, DM_Sans, Space_Mono } from "next/font/google"
+import { headers } from "next/headers"
+import { redirect } from "next/navigation"
+import { auth } from "@/lib/auth"
 import { Providers } from "./providers"
 import { LenisProvider } from "@/providers/lenis-provider"
 import { ConditionalShell } from "@/components/layout/conditional-shell"
@@ -36,7 +39,18 @@ export const metadata: Metadata = {
   },
 }
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const [session, headersList] = await Promise.all([auth(), headers()])
+  const pathname = headersList.get("x-pathname") ?? ""
+
+  if (
+    session?.user?.isBanned &&
+    !pathname.startsWith("/banned") &&
+    !pathname.startsWith("/api/auth")
+  ) {
+    redirect("/banned")
+  }
+
   const fontVars = [
     inter.variable,
     jetbrainsMono.variable,
