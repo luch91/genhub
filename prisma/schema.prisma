@@ -87,6 +87,7 @@ model User {
   hostedSessions    BuilderSession[]   @relation("BuilderSessionHost")
   hostedSpaces      Space[]            @relation("SpaceHost")
   spaceParticipants SpaceParticipant[]
+  reports           Report[]
 }
 
 enum ProjectStatus {
@@ -395,4 +396,18 @@ model SpaceParticipant {
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([spaceId, userId])
+}
+
+model Report {
+  id         String   @id @default(cuid())
+  type       String
+  contentId  String
+  reason     String?  @db.Text
+  resolved   Boolean  @default(false)
+  createdAt  DateTime @default(now())
+
+  reporterId String
+  reporter   User     @relation(fields: [reporterId], references: [id], onDelete: Cascade)
+
+  @@unique([reporterId, type, contentId])
 }

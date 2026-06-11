@@ -4,6 +4,7 @@ import { useState } from "react"
 import { useRouter } from "next/navigation"
 import Image from "next/image"
 import { formatRelativeDate } from "@/lib/utils"
+import { ReportButton } from "@/components/ui/report-button"
 
 type Comment = {
   id: string
@@ -90,14 +91,22 @@ export function CommentSection({ projectId, updateId, initialComments, currentUs
                   <span className="text-xs text-brand-navy/40">
                     {formatRelativeDate(new Date(comment.createdAt))}
                   </span>
-                  {currentUserId === comment.author.id && (
-                    <button
-                      onClick={() => handleDelete(comment.id)}
-                      className="ml-auto text-xs text-brand-navy/30 hover:text-red-500 transition-colors"
-                    >
-                      Delete
-                    </button>
-                  )}
+                  <span className="ml-auto flex items-center gap-2">
+                    <ReportButton
+                      type="comment"
+                      contentId={comment.id}
+                      currentUserId={currentUserId}
+                      authorId={comment.author.id}
+                    />
+                    {currentUserId === comment.author.id && (
+                      <button
+                        onClick={() => handleDelete(comment.id)}
+                        className="text-xs text-brand-navy/30 hover:text-red-500 transition-colors"
+                      >
+                        Delete
+                      </button>
+                    )}
+                  </span>
                 </div>
                 <p className="mt-0.5 text-sm text-brand-navy/60">{comment.content}</p>
               </div>

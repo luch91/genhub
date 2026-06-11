@@ -16,7 +16,13 @@ type AdminUser = {
   _count: { projects: number }
 }
 
-export function AdminUsersTable({ users }: { users: AdminUser[] }) {
+export function AdminUsersTable({
+  users,
+  currentUserId,
+}: {
+  users: AdminUser[]
+  currentUserId: string
+}) {
   const [list, setList]       = useState(users)
   const [loading, setLoading] = useState<string | null>(null)
 
@@ -43,6 +49,19 @@ export function AdminUsersTable({ users }: { users: AdminUser[] }) {
     })
     if (res.ok) {
       setList((prev) => prev.map((u) => u.id === userId ? { ...u, submissionCredits: next } : u))
+    }
+    setLoading(null)
+  }
+
+  async function toggleAdmin(userId: string, current: boolean) {
+    setLoading(`admin-${userId}`)
+    const res = await fetch(`/api/admin/users/${userId}`, {
+      method:  "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body:    JSON.stringify({ isAdmin: !current }),
+    })
+    if (res.ok) {
+      setList((prev) => prev.map((u) => u.id === userId ? { ...u, isAdmin: !current } : u))
     }
     setLoading(null)
   }
@@ -106,19 +125,32 @@ export function AdminUsersTable({ users }: { users: AdminUser[] }) {
                 )}
               </td>
               <td className="px-4 py-3">
-                {!u.isAdmin && (
-                  <button
-                    onClick={() => toggleBan(u.id, u.isBanned)}
-                    disabled={loading === u.id}
-                    className={`rounded-full px-3 py-1 text-xs font-semibold transition-colors disabled:opacity-50 ${
-                      u.isBanned
-                        ? "bg-emerald-50 text-emerald-700 hover:bg-emerald-100"
-                        : "bg-red-50 text-red-600 hover:bg-red-100"
-                    }`}
-                  >
-                    {u.isBanned ? "Unban" : "Ban"}
-                  </button>
-                )}
+                <div className="flex items-center gap-2">
+                  {/* Promote / demote — cannot target yourself */}
+                  {u.id !== currentUserId && (
+                    <button
+                      onClick={() => toggleAdmin(u.id, u.isAdmin)}
+                      disabled={loading === `admin-${u.id}`}
+                      className="rounded-full bg-brand-indigo/8 px-3 py-1 text-xs font-semibold text-brand-indigo hover:bg-brand-indigo/15 transition-colors disabled:opacity-50"
+                    >
+                      {u.isAdmin ? "Remove admin" : "Make admin"}
+                    </button>
+                  )}
+                  {/* Ban / unban — admins cannot be banned */}
+                  {!u.isAdmin && (
+                    <button
+                      onClick={() => toggleBan(u.id, u.isBanned)}
+                      disabled={loading === u.id}
+                      className={`rounded-full px-3 py-1 text-xs font-semibold transition-colors disabled:opacity-50 ${
+                        u.isBanned
+                          ? "bg-emerald-50 text-emerald-700 hover:bg-emerald-100"
+                          : "bg-red-50 text-red-600 hover:bg-red-100"
+                      }`}
+                    >
+                      {u.isBanned ? "Unban" : "Ban"}
+                    </button>
+                  )}
+                </div>
               </td>
             </tr>
           ))}

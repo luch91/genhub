@@ -14,18 +14,25 @@ export async function PATCH(req: NextRequest, { params }: Params) {
   const body = await req.json() as {
     isBanned?: boolean
     submissionCredits?: number
+    isAdmin?: boolean
+  }
+
+  // Prevent admins from removing their own admin status
+  if (typeof body.isAdmin === "boolean" && !body.isAdmin && userId === session.user.id) {
+    return Response.json({ error: "Cannot remove your own admin status" }, { status: 400 })
   }
 
   const data: Record<string, unknown> = {}
   if (typeof body.isBanned          === "boolean") data.isBanned          = body.isBanned
   if (typeof body.submissionCredits === "number")  data.submissionCredits = body.submissionCredits
+  if (typeof body.isAdmin           === "boolean") data.isAdmin           = body.isAdmin
 
   if (Object.keys(data).length === 0) {
     return Response.json({ error: "Nothing to update" }, { status: 400 })
   }
 
   const user = await db.user.update({ where: { id: userId }, data })
-  return Response.json({ id: user.id, isBanned: user.isBanned, submissionCredits: user.submissionCredits })
+  return Response.json({ id: user.id, isBanned: user.isBanned, submissionCredits: user.submissionCredits, isAdmin: user.isAdmin })
 }
 
 export async function DELETE(_: NextRequest, { params }: Params) {

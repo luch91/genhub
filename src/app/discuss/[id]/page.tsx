@@ -5,6 +5,7 @@ import Link from "next/link"
 import { db } from "@/lib/db"
 import { auth } from "@/lib/auth"
 import { ReplyForm } from "@/components/discuss/reply-form"
+import { ReportButton } from "@/components/ui/report-button"
 import { formatDate, formatRelativeDate } from "@/lib/utils"
 
 type PageProps = { params: Promise<{ id: string }> }
@@ -86,6 +87,12 @@ export default async function DiscussionPage({ params }: PageProps) {
             </Link>
             <span className="ml-2 text-brand-navy/35">{formatDate(discussion.createdAt)}</span>
           </div>
+          <ReportButton
+            type="discussion"
+            contentId={discussion.id}
+            currentUserId={session?.user?.id}
+            authorId={discussion.author.id}
+          />
         </div>
       </div>
 
@@ -119,6 +126,12 @@ export default async function DiscussionPage({ params }: PageProps) {
                   <span className="text-xs text-brand-navy/35">
                     {formatRelativeDate(reply.createdAt)}
                   </span>
+                  <ReportButton
+                    type="reply"
+                    contentId={reply.id}
+                    currentUserId={session?.user?.id}
+                    authorId={reply.author.id}
+                  />
                 </div>
                 <p className="whitespace-pre-wrap text-sm text-brand-navy/65">{reply.content}</p>
               </div>
