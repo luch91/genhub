@@ -25,6 +25,11 @@ export async function POST(_: NextRequest, { params }: Params) {
     return Response.json({ upvoted: false, count })
   }
 
+  // Remove any existing downvote when upvoting
+  await db.downvote.deleteMany({
+    where: { userId: session.user.id, projectId: id },
+  })
+
   await db.upvote.create({ data: { userId: session.user.id, projectId: id } })
   const count = await db.upvote.count({ where: { projectId: id } })
 

@@ -74,6 +74,7 @@ model User {
   updates     ProjectUpdate[]
   comments    Comment[]
   upvotes     Upvote[]
+  downvotes   Downvote[]
   discussions     Discussion[]
   replies         Reply[]
   projectReviews  ProjectReview[]
@@ -122,8 +123,9 @@ model Project {
   tags     ProjectTag[]
   updates  ProjectUpdate[]
   comments Comment[]
-  upvotes  Upvote[]
-  reviews  ProjectReview[]
+  upvotes   Upvote[]
+  downvotes Downvote[]
+  reviews   ProjectReview[]
   sessions BuilderSession[]
   spaces   Space[]
 }
@@ -246,6 +248,19 @@ model ProjectReview {
 }
 
 model Upvote {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  userId    String
+  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  projectId String
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, projectId])
+}
+
+model Downvote {
   id        String   @id @default(cuid())
   createdAt DateTime @default(now())
 

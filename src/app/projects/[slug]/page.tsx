@@ -31,7 +31,7 @@ async function getProject(slug: string, userId?: string) {
         orderBy: { createdAt: "asc" },
         include: { author: { select: { id: true, name: true, username: true, image: true } } },
       },
-      _count:   { select: { upvotes: true, comments: true, updates: true } },
+      _count:   { select: { upvotes: true, downvotes: true, comments: true, updates: true } },
       reviews:  { select: { decision: true, feedback: true } },
       remixedFrom: { select: { id: true, title: true, slug: true } },
     },
@@ -82,11 +82,16 @@ export default async function ProjectPage({ params }: PageProps) {
   const rejections        = project.reviews.filter((r) => r.decision === "REJECTED").length
   const rejectionFeedback = project.reviews.filter((r) => r.decision === "REJECTED" && r.feedback).map((r) => r.feedback)
 
-  const hasUpvoted = session?.user
-    ? await db.upvote.findUnique({
-        where: { userId_projectId: { userId: session.user.id, projectId: project.id } },
-      }).then(Boolean)
-    : false
+  const [hasUpvoted, hasDownvoted] = session?.user
+    ? await Promise.all([
+        db.upvote.findUnique({
+          where: { userId_projectId: { userId: session.user.id, projectId: project.id } },
+        }).then(Boolean),
+        db.downvote.findUnique({
+          where: { userId_projectId: { userId: session.user.id, projectId: project.id } },
+        }).then(Boolean),
+      ])
+    : [false, false]
 
   return (
     <div className="mx-auto max-w-4xl px-6 py-12">
@@ -230,8 +235,10 @@ export default async function ProjectPage({ params }: PageProps) {
             <div className="flex items-center gap-4">
               <UpvoteButton
                 projectId={project.id}
-                initialCount={project._count.upvotes}
+                initialUpvoteCount={project._count.upvotes}
+                initialDownvoteCount={project._count.downvotes}
                 initialUpvoted={hasUpvoted}
+                initialDownvoted={hasDownvoted}
                 currentUserId={session?.user?.id}
               />
               <div className="flex flex-1 flex-col gap-3">
